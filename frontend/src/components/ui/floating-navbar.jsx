@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { cn } from "@/lib/utils";
-// Next's Link is replaced with a normal anchor for Vite + React
+import { Link } from 'react-router-dom'
 
 export const FloatingNav = ({ navItems, className }) => {
     // Always visible by default
@@ -21,21 +21,21 @@ export const FloatingNav = ({ navItems, className }) => {
                 )}
             >
                 {navItems?.map((navItem, idx) => (
-                    <a
+                    <Link
                         key={`link=${idx}`}
-                        href={navItem.link}
+                        to={navItem.link}
                         className={cn(
                             "relative items-center flex space-x-1 text-white hover:text-neutral-200",
                         )}
                     >
                         <span className="block sm:hidden">{navItem.icon}</span>
                         <span className="hidden sm:block text-sm font-medium">{navItem.name}</span>
-                    </a>
+                    </Link>
                 ))}
-                <button className="relative text-sm font-medium px-4 py-2 rounded-full bg-white/8 border border-white/20 text-white hover:bg-white/12">
+                <Link to="/login" className="relative text-sm font-medium px-4 py-2 rounded-full bg-white/8 border border-white/20 text-white hover:bg-white/12">
                     <span>Login</span>
                     <span className="absolute inset-x-0 w-1/2 mx-auto -bottom-px bg-gradient-to-r from-transparent via-sky-400 to-transparent h-px" />
-                </button>
+                </Link>
             </motion.div>
         </AnimatePresence>
     );
