@@ -53,12 +53,12 @@ export default function LoginCardSection() {
       `}</style>
       {/* Subtle vignette */}
       <div
-        className="absolute inset-0 pointer-events-none [background:radial-gradient(80%_60%_at_50%_30%,rgba(255,255,255,0.06),transparent_60%)]" />
+        className="absolute inset-0 pointer-events-none [background:radial-gradient(80%_60%_at_50%_30%,rgba(0,0,0,0.03),transparent_60%)]" />
       {/* Animated accent lines removed */}
       {/* Header removed: branding and contact button intentionally omitted */}
       {/* Centered Login Card with Tabs (Login / Sign Up) */}
       <div className="min-h-screen w-full grid place-items-center px-4">
-        <Card className="relative z-[5100] card-animate w-full max-w-md border-zinc-800 bg-zinc-900/70 backdrop-blur supports-[backdrop-filter]:bg-zinc-900/60">
+        <Card className="relative z-[5100] card-animate w-full max-w-md border border-neutral-200/5 bg-white/5 dark:border-neutral-700 dark:bg-neutral-900/60 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/60">
           <CardHeader className="space-y-1 text-left pl-4 pr-4 pt-6">
             <CardTitle className="text-2xl">Welcome</CardTitle>
             <CardDescription className="text-zinc-400">Log in or create an account</CardDescription>

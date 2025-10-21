@@ -20,7 +20,7 @@ const links = [
 export default function Dashboard() {
     return (
         <Sidebar>
-            <div className="flex h-screen w-full bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50">
+            <div className="flex h-screen w-full bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50">
                 <DesktopSidebar className="hidden md:flex flex-col justify-between">
                     <div className="flex flex-col gap-2">
                         {/* Logo */}

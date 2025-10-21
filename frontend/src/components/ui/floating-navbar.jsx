@@ -18,7 +18,7 @@ export const FloatingNav = ({ navItems, className }) => {
                 transition={{ duration: 0.2 }}
                 className={cn(
                     // dark, slightly translucent pill with backdrop blur for legibility
-                    "fixed top-10 inset-x-0 mx-auto max-w-fit rounded-full bg-black/75 backdrop-blur-sm border border-white/10 text-white shadow-lg z-[5000] pr-3 pl-8 py-2 flex items-center justify-center space-x-4",
+                    "fixed top-10 inset-x-0 mx-auto max-w-fit rounded-full bg-neutral-950/75 backdrop-blur-sm border border-neutral-700/40 text-white shadow-lg z-[5000] pr-3 pl-8 py-2 flex items-center justify-center space-x-4",
                     className
                 )}
             >
