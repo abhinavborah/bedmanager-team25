@@ -10,6 +10,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { z } from 'zod';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import {
   ArrowRight,
   Chrome,
 } from "lucide-react";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { HeroHighlight } from "@/components/ui/hero-highlight";
 
 export default function LoginCardSection() {
@@ -32,8 +34,31 @@ export default function LoginCardSection() {
   const [showLoginPw, setShowLoginPw] = useState(false);
   const [showSignupPw, setShowSignupPw] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
+  const [role, setRole] = useState('Hospital Admin');
+  const nameRef = useRef(null);
+  const loginEmailRef = useRef(null);
+  const loginPwRef = useRef(null);
+  const signupEmailRef = useRef(null);
+  const signupPwRef = useRef(null);
+  const [termsChecked, setTermsChecked] = useState(false);
+
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Background is provided by HeroHighlight; particle canvas removed.
+
+  const loginSchema = z.object({
+    email: z.string().min(1, 'Required').email('Invalid email'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+  });
+
+  const signupSchema = z.object({
+    role: z.string().min(1, 'Role is required'),
+    name: z.string().min(2, 'Full name is required'),
+    email: z.string().min(1, 'Required').email('Invalid email'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    terms: z.literal(true, { errorMap: () => ({ message: 'You must accept Terms & Privacy' }) }),
+  });
 
   return (
     <HeroHighlight center={false} containerClassName="fixed inset-0 text-zinc-50">
@@ -79,15 +104,16 @@ export default function LoginCardSection() {
                       <Label htmlFor="login-email" className="text-zinc-300">Email</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                        <Input id="login-email" type="email" placeholder="you@example.com" className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
+                        <Input ref={loginEmailRef} id="login-email" type="email" placeholder="you@example.com" className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
                       </div>
+                      {errors.loginEmail && <p className="text-xs text-red-400 mt-1">{errors.loginEmail}</p>}
                     </div>
 
                     <div className="grid gap-2 text-left">
                       <Label htmlFor="login-password" className="text-zinc-300">Password</Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                        <Input id="login-password" type={showLoginPw ? "text" : "password"} placeholder="••••••••" className="pl-10 pr-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
+                        <Input ref={loginPwRef} id="login-password" type={showLoginPw ? "text" : "password"} placeholder="••••••••" className="pl-10 pr-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
                         <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md text-zinc-400 hover:text-zinc-200" onClick={() => setShowLoginPw(v => !v)} aria-label={showLoginPw ? "Hide password" : "Show password"}>
                           {showLoginPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
@@ -102,7 +128,32 @@ export default function LoginCardSection() {
                       <a href="#" className="text-sm text-zinc-300 hover:text-zinc-100">Forgot password?</a>
                     </div>
 
-                    <Button className="w-full h-10 rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-200">Continue</Button>
+                    <Button disabled={isSubmitting} onClick={async () => {
+                      setIsSubmitting(true);
+                      setErrors({});
+                      try {
+                        const payload = {
+                          email: loginEmailRef.current?.value || '',
+                          password: loginPwRef.current?.value || '',
+                        };
+                        const result = loginSchema.safeParse(payload);
+                        if (!result.success) {
+                          const fieldErrors = {};
+                          for (const issue of result.error.issues) {
+                            fieldErrors[issue.path[0] === 'email' ? 'loginEmail' : 'loginPassword'] = issue.message;
+                          }
+                          setErrors(fieldErrors);
+                          return;
+                        }
+
+                        // mock login
+                        console.log('Login payload:', payload);
+                        alert('Logged in (mock) — check console for payload.');
+                      } finally {
+                        setIsSubmitting(false);
+                      }
+                    }} className="w-full h-10 rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-200">Continue</Button>
+                    {errors.loginPassword && <p className="text-xs text-red-400 mt-1">{errors.loginPassword}</p>}
 
                     {/* <div className="relative">
                       <Separator className="bg-zinc-800" />
@@ -119,38 +170,85 @@ export default function LoginCardSection() {
                 {activeTab === "signup" && (
                   <div className="tab-panel space-y-5">
                     <div className="grid gap-2 text-left">
+                      <Label htmlFor="role" className="text-zinc-300">Role</Label>
+                      <Select value={role} onValueChange={setRole}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Hospital Admin">Hospital Admin</SelectItem>
+                          <SelectItem value="ER Staff">ER Staff</SelectItem>
+                          <SelectItem value="Ward Staff">Ward Staff</SelectItem>
+                          <SelectItem value="ICU Manager">ICU Manager</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.role && <p className="text-xs text-red-400 mt-1">{errors.role}</p>}
+                    </div>
+                    <div className="grid gap-2 text-left">
                       <Label htmlFor="name" className="text-zinc-300">Full Name</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                        <Input id="name" type="text" placeholder="John Doe" className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
+                        <Input ref={nameRef} id="name" type="text" placeholder="John Doe" className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
                       </div>
+                      {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
                     </div>
 
                     <div className="grid gap-2 text-left">
                       <Label htmlFor="signup-email" className="text-zinc-300">Email</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                        <Input id="signup-email" type="email" placeholder="you@example.com" className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
+                        <Input ref={signupEmailRef} id="signup-email" type="email" placeholder="you@example.com" className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
                       </div>
+                      {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
                     </div>
 
                     <div className="grid gap-2 text-left">
                       <Label htmlFor="signup-password" className="text-zinc-300">Password</Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                        <Input id="signup-password" type={showSignupPw ? "text" : "password"} placeholder="••••••••" className="pl-10 pr-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
+                        <Input ref={signupPwRef} id="signup-password" type={showSignupPw ? "text" : "password"} placeholder="••••••••" className="pl-10 pr-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
                         <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md text-zinc-400 hover:text-zinc-200" onClick={() => setShowSignupPw(v => !v)} aria-label={showSignupPw ? "Hide password" : "Show password"}>
                           {showSignupPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                       </div>
+                      {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <Checkbox id="terms" className="border-zinc-700 data-[state=checked]:bg-zinc-50 data-[state=checked]:text-zinc-900" />
+                      <Checkbox checked={termsChecked} onCheckedChange={setTermsChecked} id="terms" className="border-zinc-700 data-[state=checked]:bg-zinc-50 data-[state=checked]:text-zinc-900" />
                       <Label htmlFor="terms" className="text-zinc-400 text-sm">I agree to the Terms & Privacy</Label>
                     </div>
 
-                    <Button className="w-full h-10 rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-200">Create account</Button>
+                    <Button disabled={isSubmitting} onClick={async () => {
+                      setIsSubmitting(true);
+                      setErrors({});
+                      try {
+                        const payload = {
+                          role,
+                          name: nameRef.current?.value || '',
+                          email: signupEmailRef.current?.value || '',
+                          password: signupPwRef.current?.value || '',
+                          terms: termsChecked,
+                        };
+
+                        const result = signupSchema.safeParse(payload);
+                        if (!result.success) {
+                          const fieldErrors = {};
+                          for (const issue of result.error.issues) {
+                            fieldErrors[issue.path[0]] = issue.message;
+                          }
+                          setErrors(fieldErrors);
+                          return;
+                        }
+
+                        // Mock submit - replace with API call when ready
+                        console.log('Sign up payload:', payload);
+                        alert('Account created (mock) — check console for payload.');
+                        setActiveTab('login');
+                      } finally {
+                        setIsSubmitting(false);
+                      }
+                    }} className="w-full h-10 rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-200">Create account</Button>
                     {/* 
                     <div className="relative">
                       <Separator className="bg-zinc-800" />
