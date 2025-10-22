@@ -92,7 +92,7 @@ export default function Dashboard() {
     return (
         <Sidebar>
             <div className="flex h-screen w-full bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50">
-                <DesktopSidebar className="hidden md:flex flex-col justify-between">
+                <SidebarBody className="flex-col justify-between">
                     <div className="flex flex-col gap-2">
                         {/* Logo */}
                         <div className="mt-2"><Logo /></div>
@@ -108,7 +108,7 @@ export default function Dashboard() {
                     <div className="mb-4">
                         <ProfileLink />
                     </div>
-                </DesktopSidebar>
+                </SidebarBody>
 
                 <div className="flex-1 p-8 overflow-auto">
                     <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center md:items-start justify-between mb-6 gap-4">
