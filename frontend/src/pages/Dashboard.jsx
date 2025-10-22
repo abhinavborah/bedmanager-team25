@@ -12,6 +12,13 @@ import {
 import { Home, Settings, Users, BarChart2 } from "lucide-react";
 import { motion, AnimatePresence } from 'framer-motion';
 import { BedSelection } from '@/components/ui/bed-selection';
+import {
+    Select,
+    SelectTrigger,
+    SelectContent,
+    SelectItem,
+    SelectValue,
+} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 
 const links = [
@@ -66,7 +73,15 @@ const Legend = () => (
 
 export default function Dashboard() {
     const [selectedBeds, setSelectedBeds] = useState(['iA4']);
+    const [selectedCategory, setSelectedCategory] = useState('ALL');
     const occupiedBeds = useMemo(() => ['F17', 'F18', 'F19', 'iA1', 'C2', 'C10', 'C11', 'E9'], []);
+
+    const filteredLayout = useMemo(() => {
+        if (selectedCategory === 'ALL') return bedLayoutData;
+        return bedLayoutData.filter((c) => c.categoryName === selectedCategory);
+    }, [selectedCategory]);
+
+    const categories = useMemo(() => ['ALL', ...bedLayoutData.map(c => c.categoryName)], []);
 
     const handleBedSelect = (bedId) => {
         setSelectedBeds((prev) => prev.includes(bedId) ? prev.filter(id => id !== bedId) : [...prev, bedId]);
@@ -96,12 +111,30 @@ export default function Dashboard() {
                 </DesktopSidebar>
 
                 <div className="flex-1 p-8 overflow-auto">
-                    <h1 className="text-4xl font-bold mb-4">Dashboard</h1>
-                    <p className="text-md text-neutral-600 dark:text-neutral-300 mb-6">Below is the bed selection demo.</p>
+                    <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row items-center md:items-start justify-between mb-6 gap-4">
+                        <div className="w-full md:w-auto text-center md:text-left">
+                            <h1 className="text-4xl font-bold">Dashboard</h1>
+                            <p className="text-md text-neutral-600 dark:text-neutral-300">Below is the bed selection demo.</p>
+                        </div>
+
+                        <div className="w-48 md:mt-0">
+                            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Show All" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categories.map(cat => (
+                                        <SelectItem key={cat} value={cat}>{cat === 'ALL' ? 'Show All' : cat}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
 
                     <div className="w-full max-w-5xl mx-auto flex flex-col items-center py-4">
                         <BedSelection
-                            layout={bedLayoutData}
+                            key={selectedCategory}
+                            layout={filteredLayout}
                             selectedBeds={selectedBeds}
                             occupiedBeds={occupiedBeds}
                             onBedSelect={handleBedSelect}

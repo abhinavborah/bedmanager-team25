@@ -15,7 +15,7 @@ const Bed = React.memo(({
 }) => {
   // Render a spacer div if the bed is a spacer
   if (bed.isSpacer) {
-    return <div className="w-8 h-8 md:w-10 md:h-10" aria-hidden="true" />;
+    return <div className="w-4 h-6 sm:w-5 sm:h-8 md:w-8 md:h-10" aria-hidden="true" />;
   }
 
   const isOccupied = status === 'occupied';
@@ -28,7 +28,7 @@ const Bed = React.memo(({
       aria-pressed={status === 'selected'}
       className={cn(
         // vertical rounded rectangle for beds: narrow width, taller height
-        'w-8 h-14 md:w-10 md:h-16 rounded-2xl border flex items-center justify-center text-sm font-semibold transition-all duration-300 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring focus-visible:ring-offset-background',
+        'w-6 h-10 sm:w-7 sm:h-12 md:w-8 md:h-14 lg:w-10 lg:h-16 rounded-2xl border flex items-center justify-center text-sm font-semibold transition-all duration-300 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring focus-visible:ring-offset-background',
         {
           // available -> green
           'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 cursor-pointer': status === 'available',
