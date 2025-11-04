@@ -17,6 +17,8 @@ const handleValidationErrors = (req, res, next) => {
       value: error.value
     }));
 
+    console.log('❌ Validation errors:', errorMessages);
+
     return res.status(400).json({
       success: false,
       message: 'Validation failed',
@@ -52,14 +54,12 @@ const validateRegister = [
     .notEmpty()
     .withMessage('Password is required')
     .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+    .withMessage('Password must be at least 6 characters long'),
   
   body('role')
     .optional()
-    .isIn(['admin', 'doctor', 'nurse', 'patient', 'staff'])
-    .withMessage('Role must be one of: admin, doctor, nurse, patient, staff'),
+    .isIn(['technical_team', 'hospital_admin', 'er_staff', 'ward_staff', 'icu_manager'])
+    .withMessage('Role must be one of: technical_team, hospital_admin, er_staff, ward_staff, icu_manager'),
   
   handleValidationErrors
 ];
@@ -92,9 +92,8 @@ const validateCreateBed = [
     .trim()
     .notEmpty()
     .withMessage('Bed ID is required')
-    .matches(/^[A-Z0-9-]+$/)
-    .withMessage('Bed ID must contain only uppercase letters, numbers, and hyphens')
-    .toUpperCase(),
+    .matches(/^[A-Za-z0-9-]+$/)
+    .withMessage('Bed ID must contain only letters, numbers, and hyphens'),
   
   body('ward')
     .trim()
@@ -109,14 +108,17 @@ const validateCreateBed = [
     .isIn(['available', 'occupied', 'maintenance', 'reserved'])
     .withMessage('Status must be one of: available, occupied, maintenance, reserved'),
   
+  body('patientName')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Patient name cannot exceed 100 characters'),
+  
   body('patientId')
     .optional()
-    .custom((value) => {
-      if (value && !mongoose.Types.ObjectId.isValid(value)) {
-        throw new Error('Invalid patient ID format');
-      }
-      return true;
-    }),
+    .trim()
+    .isLength({ max: 50 })
+    .withMessage('Patient ID cannot exceed 50 characters'),
   
   handleValidationErrors
 ];
@@ -135,17 +137,21 @@ const validateUpdateBedStatus = [
     .isIn(['available', 'occupied', 'maintenance', 'reserved'])
     .withMessage('Status must be one of: available, occupied, maintenance, reserved'),
   
+  body('patientName')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Patient name cannot exceed 100 characters'),
+  
   body('patientId')
     .optional()
-    .custom((value) => {
-      if (value && !mongoose.Types.ObjectId.isValid(value)) {
-        throw new Error('Invalid patient ID format');
-      }
-      return true;
-    })
+    .trim()
+    .isLength({ max: 50 })
+    .withMessage('Patient ID cannot exceed 50 characters')
     .custom((value, { req }) => {
-      if (req.body.status === 'occupied' && !value) {
-        throw new Error('Patient ID is required when status is occupied');
+      // When status is occupied, either patientName or patientId must be provided
+      if (req.body.status === 'occupied' && !value && !req.body.patientName) {
+        throw new Error('Patient name or ID is required when status is occupied');
       }
       return true;
     }),

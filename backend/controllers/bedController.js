@@ -31,9 +31,8 @@ exports.getAllBeds = async (req, res) => {
       filter.ward = ward;
     }
 
-    // Fetch beds with optional population
+    // Fetch beds
     const beds = await Bed.find(filter)
-      .populate('patientId', 'name email')
       .sort({ ward: 1, bedId: 1 });
 
     res.status(200).json({
@@ -64,11 +63,10 @@ exports.getBedById = async (req, res) => {
 
     // Check if id is a valid MongoDB ObjectId
     if (mongoose.Types.ObjectId.isValid(id)) {
-      bed = await Bed.findById(id).populate('patientId', 'name email role');
+      bed = await Bed.findById(id);
     } else {
-      // Try to find by bedId (e.g., "BED-101")
-      bed = await Bed.findOne({ bedId: id.toUpperCase() })
-        .populate('patientId', 'name email role');
+      // Try to find by bedId (e.g., "iA5", "BED-101")
+      bed = await Bed.findOne({ bedId: id });
     }
 
     if (!bed) {
@@ -97,12 +95,12 @@ exports.getBedById = async (req, res) => {
  * @route   PATCH /api/beds/:id/status
  * @access  Private (Requires JWT)
  * @param   id - MongoDB ObjectId or bedId
- * @body    status, patientId (optional)
+ * @body    status, patientName, patientId (optional - external patient identifier)
  */
 exports.updateBedStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, patientId } = req.body;
+    const { status, patientName, patientId } = req.body;
 
     // Validate status
     const validStatuses = ['available', 'occupied', 'maintenance', 'reserved'];
@@ -125,7 +123,7 @@ exports.updateBedStatus = async (req, res) => {
     if (mongoose.Types.ObjectId.isValid(id)) {
       bed = await Bed.findById(id);
     } else {
-      bed = await Bed.findOne({ bedId: id.toUpperCase() });
+      bed = await Bed.findOne({ bedId: id });
     }
 
     if (!bed) {
@@ -135,39 +133,12 @@ exports.updateBedStatus = async (req, res) => {
       });
     }
 
-    // Validate status change logic
-    if (status === 'occupied' && !patientId) {
+    // Validate patient info for occupied status
+    if (status === 'occupied' && !patientName && !patientId) {
       return res.status(400).json({
         success: false,
-        message: 'Patient ID is required when marking bed as occupied'
+        message: 'Patient name or ID is required when marking bed as occupied'
       });
-    }
-
-    // Validate patientId if provided
-    if (patientId) {
-      if (!mongoose.Types.ObjectId.isValid(patientId)) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid patient ID format'
-        });
-      }
-
-      const User = mongoose.model('User');
-      const patient = await User.findById(patientId);
-      
-      if (!patient) {
-        return res.status(404).json({
-          success: false,
-          message: 'Patient not found'
-        });
-      }
-
-      if (patient.role !== 'patient') {
-        return res.status(400).json({
-          success: false,
-          message: 'User must have role "patient" to be assigned to a bed'
-        });
-      }
     }
 
     // Store previous status for logging
@@ -175,7 +146,8 @@ exports.updateBedStatus = async (req, res) => {
 
     // Update bed
     bed.status = status;
-    bed.patientId = status === 'occupied' ? patientId : null;
+    bed.patientName = status === 'occupied' ? (patientName || null) : null;
+    bed.patientId = status === 'occupied' ? (patientId || null) : null;
     await bed.save();
 
     // Determine status change type for logging
@@ -211,9 +183,6 @@ exports.updateBedStatus = async (req, res) => {
       console.error('Error creating occupancy log:', logError);
       // Continue even if logging fails - don't block the main operation
     }
-
-    // Populate patient details
-    await bed.populate('patientId', 'name email');
 
     // Emit bedUpdate event via socket.io
     if (req.io) {

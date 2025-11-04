@@ -26,6 +26,7 @@
 // module.exports = app;
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const http = require('http');
 const socketIO = require('socket.io');
 const connectDB = require('./config/db');
@@ -44,6 +45,32 @@ const io = socketIO(server, {
     methods: ['GET', 'POST']
   }
 });
+
+// Enable CORS for all routes - Allow both localhost and 127.0.0.1
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like Postman, mobile apps, curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 

@@ -29,12 +29,24 @@ export const SocketProvider = ({ children }) => {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    // Connect socket when user is authenticated
-    if (isAuthenticated && token) {
+    // Get token from Redux or fallback to localStorage
+    const localToken = localStorage.getItem('authToken');
+    const actualToken = token || (localToken !== 'undefined' && localToken !== 'null' ? localToken : null);
+    
+    console.log('🔍 SocketProvider state:', {
+      isAuthenticated,
+      hasReduxToken: !!token,
+      hasLocalStorageToken: !!localStorage.getItem('authToken'),
+      localTokenValue: localToken,
+      actualToken: actualToken ? `${actualToken.substring(0, 20)}...` : 'none'
+    });
+    
+    // Connect socket when user is authenticated and has valid token
+    if (isAuthenticated && actualToken) {
       console.log('🔌 Initializing socket connection...');
-      socketRef.current = connectSocket(token, dispatch);
+      socketRef.current = connectSocket(actualToken, dispatch);
     } else {
-      // Disconnect socket when user logs out
+      // Disconnect socket when user logs out or no valid token
       if (socketRef.current) {
         console.log('🔌 User logged out, disconnecting socket...');
         disconnectSocket();
