@@ -8,12 +8,10 @@ const bedSchema = new mongoose.Schema(
     bedId: {
       type: String,
       required: [true, 'Bed ID is required'],
-      unique: true,
       trim: true,
-      uppercase: true,
       match: [
-        /^[A-Z0-9-]+$/,
-        'Bed ID must contain only uppercase letters, numbers, and hyphens'
+        /^[A-Za-z0-9-]+$/,
+        'Bed ID must contain only letters, numbers, and hyphens'
       ]
     },
     status: {
@@ -31,19 +29,17 @@ const bedSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, 'Ward name cannot exceed 100 characters']
     },
-    patientId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+    patientName: {
+      type: String,
       default: null,
-      validate: {
-        validator: async function(value) {
-          if (!value) return true; // Allow null
-          const User = mongoose.model('User');
-          const user = await User.findById(value);
-          return user && user.role === 'patient';
-        },
-        message: 'Patient ID must reference a valid user with role "patient"'
-      }
+      trim: true,
+      maxlength: [100, 'Patient name cannot exceed 100 characters']
+    },
+    patientId: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: [50, 'Patient ID cannot exceed 50 characters']
     }
   },
   {
@@ -52,8 +48,8 @@ const bedSchema = new mongoose.Schema(
   }
 );
 
-// Index for faster bedId lookups
-bedSchema.index({ bedId: 1 });
+// Index for faster bedId lookups (unique)
+bedSchema.index({ bedId: 1 }, { unique: true });
 
 // Index for ward-based queries
 bedSchema.index({ ward: 1 });
@@ -64,13 +60,14 @@ bedSchema.index({ status: 1 });
 // Compound index for ward + status queries
 bedSchema.index({ ward: 1, status: 1 });
 
-// Middleware to validate patientId only when status is 'occupied'
+// Middleware to validate patient info when status is 'occupied'
 bedSchema.pre('save', function(next) {
-  if (this.status === 'occupied' && !this.patientId) {
-    return next(new Error('Patient ID is required when bed status is "occupied"'));
+  if (this.status === 'occupied' && !this.patientName && !this.patientId) {
+    return next(new Error('Patient name or ID is required when bed status is "occupied"'));
   }
-  if (this.status !== 'occupied' && this.patientId) {
-    this.patientId = null; // Clear patientId if bed is not occupied
+  if (this.status !== 'occupied') {
+    this.patientName = null;
+    this.patientId = null; // Clear patient info if bed is not occupied
   }
   next();
 });

@@ -12,20 +12,62 @@ const initialState = {
 // Async thunk for login
 export const login = createAsyncThunk(
   'auth/login',
-  async ({ username, password }, { rejectWithValue }) => {
+  async ({ email, password }, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/login', {
-        username,
+        email,
         password,
       });
       
-      // Save token and user to localStorage
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      // Extract token and user from response
+      const { data } = response.data; // response.data.data contains user and token
+      const token = data?.token;
+      const user = data?.user;
       
-      return response.data; // Returns { token, user }
+      if (!token || !user) {
+        console.error('Invalid login response:', response.data);
+        throw new Error('Invalid response: missing token or user data');
+      }
+      
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      return { token, user }; // Returns { token, user }
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// Async thunk for registration
+export const register = createAsyncThunk(
+  'auth/register',
+  async ({ name, email, password, role }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/auth/register', {
+        name,
+        email,
+        password,
+        role,
+      });
+      
+      // Extract token and user from response
+      const { data } = response.data; // response.data.data contains user and token
+      const token = data?.token;
+      const user = data?.user;
+      
+      if (!token || !user) {
+        console.error('Invalid registration response:', response.data);
+        throw new Error('Invalid response: missing token or user data');
+      }
+      
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      return { token, user }; // Returns { token, user }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
       return rejectWithValue(errorMessage);
     }
   }
@@ -84,6 +126,21 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
+      })
+      // Register
+      .addCase(register.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.error = null;
+      })
+      .addCase(register.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })

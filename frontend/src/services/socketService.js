@@ -21,6 +21,13 @@ export const connectSocket = (token, dispatch) => {
     socket.disconnect();
   }
 
+  console.log('🔍 Connecting socket with token:', {
+    hasToken: !!token,
+    tokenType: typeof token,
+    tokenPreview: token ? `${token.substring(0, 20)}...` : 'none',
+    tokenLength: token?.length
+  });
+
   // Create new socket connection
   const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
   

@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import "./App.css"
 import { WavyBackground } from "@/components/ui/wavy-background"
 import { HeroHighlight, Highlight } from "@/components/ui/hero-highlight"
@@ -6,11 +6,20 @@ import { FloatingNav } from "@/components/ui/floating-navbar"
 import { motion } from "framer-motion"
 import { Home, User, MessageSquare } from "lucide-react"
 import { Routes, Route, useLocation } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { restoreSession } from '@/features/auth/authSlice'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 
 function App() {
   const location = useLocation();
+  const dispatch = useDispatch();
+  
+  // Restore session on app load
+  useEffect(() => {
+    dispatch(restoreSession());
+  }, [dispatch]);
+  
   const navItems = [
     { name: "Home", link: "/", icon: <Home className="h-4 w-4 text-neutral-500 dark:text-white" /> },
     { name: "About", link: "/about", icon: <User className="h-4 w-4 text-neutral-500 dark:text-white" /> },

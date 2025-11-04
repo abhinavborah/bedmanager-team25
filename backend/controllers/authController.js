@@ -11,9 +11,13 @@ const { AppError } = require('../middleware/errorHandler');
 exports.register = async (req, res) => {
   try {
     const { email, password, name, role } = req.body;
+    
+    // Debug log
+    console.log('📝 Register request body:', { email, password: password ? '***' : undefined, name, role });
 
     // Validate required fields
     if (!email || !password || !name) {
+      console.log('❌ Validation failed: Missing required fields');
       return res.status(400).json({
         success: false,
         message: 'Please provide email, password, and name'
@@ -42,7 +46,7 @@ exports.register = async (req, res) => {
       name,
       email: email.toLowerCase(),
       password,
-      role: role || 'patient'
+      role: role || 'ward_staff'
     });
 
     // Generate JWT token

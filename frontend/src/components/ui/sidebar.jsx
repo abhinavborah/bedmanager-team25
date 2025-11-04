@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "@/features/auth/authSlice";
 
 const SidebarContext = createContext(undefined);
 
@@ -129,11 +131,9 @@ export const SidebarLink = ({
   ...props
 }) => {
   const { open, animate } = useSidebar();
-  return (
-    <Link
-      to={link.href}
-      className={cn("flex items-center justify-start gap-2 group/sidebar py-3 px-3", className)}
-      {...props}>
+  
+  const content = (
+    <>
       {/* fixed-size icon container so icon remains visible when sidebar is collapsed */}
       <span className="h-6 w-6 flex-shrink-0 text-neutral-700 dark:text-neutral-200 flex items-center justify-center">
         {link.icon}
@@ -156,6 +156,26 @@ export const SidebarLink = ({
           {link.label}
         </motion.span>
       </div>
+    </>
+  );
+  
+  if (link.onClick) {
+    return (
+      <button
+        onClick={link.onClick}
+        className={cn("flex items-center justify-start gap-2 group/sidebar py-3 px-3 w-full text-left", className)}
+        {...props}>
+        {content}
+      </button>
+    );
+  }
+  
+  return (
+    <Link
+      to={link.href}
+      className={cn("flex items-center justify-start gap-2 group/sidebar py-3 px-3", className)}
+      {...props}>
+      {content}
     </Link>
   );
 };
@@ -194,11 +214,25 @@ export const LogoIcon = () => (
 
 export const ProfileLink = () => {
   const { open, animate } = useSidebar();
+  const currentUser = useSelector(selectCurrentUser);
+  
+  // Get user initials for avatar
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+  
   return (
     <div className="group/sidebar flex items-center justify-start gap-2 py-4 px-3">
-      <span className="h-6 w-6 rounded-full bg-sky-500 flex-shrink-0" />
+      <div className="h-8 w-8 rounded-full bg-sky-500 flex-shrink-0 flex items-center justify-center text-white text-xs font-semibold">
+        {currentUser ? getInitials(currentUser.name) : '?'}
+      </div>
       <div className="relative flex-1">
-        <motion.span
+        <motion.div
           aria-hidden={!open}
           animate={{
             opacity: animate ? (open ? 1 : 0) : 1,
@@ -206,12 +240,15 @@ export const ProfileLink = () => {
           }}
           transition={{ duration: 0.18 }}
           className={cn(
-            "absolute left-5 top-1/2 -translate-y-1/2 text-neutral-700 dark:text-neutral-200 text-sm whitespace-pre transition-transform duration-150 group-hover/sidebar:translate-x-1",
+            "absolute left-2 top-1/2 -translate-y-1/2 text-neutral-700 dark:text-neutral-200 whitespace-pre transition-transform duration-150 group-hover/sidebar:translate-x-1",
             !open && "pointer-events-none"
           )}
         >
-          John Doe
-        </motion.span>
+          <div className="text-sm font-medium">{currentUser?.name || 'Guest'}</div>
+          <div className="text-xs text-neutral-500 dark:text-neutral-400 capitalize">
+            {currentUser?.role?.replace(/_/g, ' ') || 'No role'}
+          </div>
+        </motion.div>
       </div>
     </div>
   );

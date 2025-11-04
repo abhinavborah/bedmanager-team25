@@ -2,6 +2,9 @@
 
 import * as React from "react";
 import { useState, useRef, useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { login as loginAction, register as registerAction } from '@/features/auth/authSlice';
 import {
   Card,
   CardHeader,
@@ -30,11 +33,15 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import { HeroHighlight } from "@/components/ui/hero-highlight";
 
 export default function LoginCardSection() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { status, error } = useSelector((state) => state.auth);
+  
   const [showPassword, setShowPassword] = useState(false);
   const [showLoginPw, setShowLoginPw] = useState(false);
   const [showSignupPw, setShowSignupPw] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
-  const [role, setRole] = useState('Hospital Admin');
+  const [role, setRole] = useState('ward_staff');
   const nameRef = useRef(null);
   const loginEmailRef = useRef(null);
   const loginPwRef = useRef(null);
@@ -43,7 +50,7 @@ export default function LoginCardSection() {
   const [termsChecked, setTermsChecked] = useState(false);
 
   const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmitting = status === 'loading';
 
   // Background is provided by HeroHighlight; particle canvas removed.
 
@@ -129,7 +136,6 @@ export default function LoginCardSection() {
                     </div>
 
                     <Button disabled={isSubmitting} onClick={async () => {
-                      setIsSubmitting(true);
                       setErrors({});
                       try {
                         const payload = {
@@ -146,13 +152,21 @@ export default function LoginCardSection() {
                           return;
                         }
 
-                        // mock login
-                        console.log('Login payload:', payload);
-                        alert('Logged in (mock) — check console for payload.');
-                      } finally {
-                        setIsSubmitting(false);
+                        // Call login action
+                        const resultAction = await dispatch(loginAction(payload));
+                        if (loginAction.fulfilled.match(resultAction)) {
+                          // Success - navigate to dashboard
+                          navigate('/about');
+                        } else {
+                          // Error - show message
+                          setErrors({ loginPassword: resultAction.payload || 'Login failed' });
+                        }
+                      } catch (err) {
+                        setErrors({ loginPassword: 'An unexpected error occurred' });
                       }
-                    }} className="w-full h-10 rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-200">Continue</Button>
+                    }} className="w-full h-10 rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-200">
+                      {isSubmitting ? 'Logging in...' : 'Continue'}
+                    </Button>
                     {errors.loginPassword && <p className="text-xs text-red-400 mt-1">{errors.loginPassword}</p>}
 
                     {/* <div className="relative">
@@ -176,10 +190,11 @@ export default function LoginCardSection() {
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Hospital Admin">Hospital Admin</SelectItem>
-                          <SelectItem value="ER Staff">ER Staff</SelectItem>
-                          <SelectItem value="Ward Staff">Ward Staff</SelectItem>
-                          <SelectItem value="ICU Manager">ICU Manager</SelectItem>
+                          <SelectItem value="technical_team">Technical/IT Team</SelectItem>
+                          <SelectItem value="hospital_admin">Hospital Admin</SelectItem>
+                          <SelectItem value="er_staff">ER Staff</SelectItem>
+                          <SelectItem value="ward_staff">Ward Staff</SelectItem>
+                          <SelectItem value="icu_manager">ICU Manager</SelectItem>
                         </SelectContent>
                       </Select>
                       {errors.role && <p className="text-xs text-red-400 mt-1">{errors.role}</p>}
@@ -220,7 +235,6 @@ export default function LoginCardSection() {
                     </div>
 
                     <Button disabled={isSubmitting} onClick={async () => {
-                      setIsSubmitting(true);
                       setErrors({});
                       try {
                         const payload = {
@@ -241,14 +255,27 @@ export default function LoginCardSection() {
                           return;
                         }
 
-                        // Mock submit - replace with API call when ready
-                        console.log('Sign up payload:', payload);
-                        alert('Account created (mock) — check console for payload.');
-                        setActiveTab('login');
-                      } finally {
-                        setIsSubmitting(false);
+                        // Call register action
+                        const resultAction = await dispatch(registerAction({
+                          name: payload.name,
+                          email: payload.email,
+                          password: payload.password,
+                          role: payload.role
+                        }));
+                        
+                        if (registerAction.fulfilled.match(resultAction)) {
+                          // Success - navigate to dashboard
+                          navigate('/about');
+                        } else {
+                          // Error - show message
+                          setErrors({ password: resultAction.payload || 'Registration failed' });
+                        }
+                      } catch (err) {
+                        setErrors({ password: 'An unexpected error occurred' });
                       }
-                    }} className="w-full h-10 rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-200">Create account</Button>
+                    }} className="w-full h-10 rounded-lg bg-zinc-50 text-zinc-900 hover:bg-zinc-200">
+                      {isSubmitting ? 'Creating account...' : 'Create account'}
+                    </Button>
                     {/* 
                     <div className="relative">
                       <Separator className="bg-zinc-800" />

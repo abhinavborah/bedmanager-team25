@@ -9,18 +9,26 @@ const initializeSocket = (io) => {
   io.use((socket, next) => {
     const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.split(' ')[1];
     
+    console.log('🔍 Socket connection attempt:', {
+      socketId: socket.id,
+      hasAuthToken: !!socket.handshake.auth.token,
+      hasAuthHeader: !!socket.handshake.headers.authorization,
+      tokenPreview: token ? `${token.substring(0, 20)}...` : 'none'
+    });
+    
     if (!token) {
       console.log(`❌ Connection rejected: No token provided (${socket.id})`);
       return next(new Error('Authentication error: No token provided'));
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
       socket.user = decoded; // Attach user data to socket
       console.log(`✅ User authenticated: ${decoded.email} (${socket.id})`);
       next();
     } catch (error) {
-      console.log(`❌ Connection rejected: Invalid token (${socket.id})`);
+      console.log(`❌ Connection rejected: Invalid token (${socket.id})`, error.message);
+      console.log('Token causing error:', token);
       return next(new Error('Authentication error: Invalid token'));
     }
   });
