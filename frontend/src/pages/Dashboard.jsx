@@ -13,7 +13,7 @@ import {
     LogoIcon,
     ProfileLink,
 } from "@/components/ui/sidebar";
-import { Home, Settings, Users, BarChart2 } from "lucide-react";
+import { Home, Settings, Users, BarChart2, Bell } from "lucide-react";
 import { motion, AnimatePresence } from 'framer-motion';
 import { BedSelection } from '@/components/ui/bed-selection';
 import {
@@ -83,6 +83,7 @@ function Dashboard() {
 
     const links = [
         { label: "Overview", href: "#overview", icon: <BarChart2 className="h-4 w-4" /> },
+        { label: "Requests", href: "#requests", icon: <Bell className="h-4 w-4" /> },
         {
             label: "Settings",
             href: "#settings",

@@ -131,7 +131,7 @@ export const SidebarLink = ({
   ...props
 }) => {
   const { open, animate } = useSidebar();
-  
+
   const content = (
     <>
       {/* fixed-size icon container so icon remains visible when sidebar is collapsed */}
@@ -158,7 +158,7 @@ export const SidebarLink = ({
       </div>
     </>
   );
-  
+
   if (link.onClick) {
     return (
       <button
@@ -169,7 +169,7 @@ export const SidebarLink = ({
       </button>
     );
   }
-  
+
   return (
     <Link
       to={link.href}
@@ -183,9 +183,17 @@ export const SidebarLink = ({
 // Simple Logo components used in the Dashboard
 export const Logo = () => {
   const { open, animate } = useSidebar();
+  const currentUser = useSelector(selectCurrentUser);
+
+  // Get first name from user name
+  const getFirstName = (name) => {
+    if (!name) return 'User';
+    const parts = name.split(' ');
+    return parts[0];
+  };
+
   return (
     <div className="group/sidebar flex items-center justify-start gap-2 py-2 px-3">
-      <span className="h-6 w-6 flex-shrink-0 bg-white/90 rounded-md" />
       <div className="relative flex-1">
         <motion.span
           aria-hidden={!open}
@@ -195,11 +203,11 @@ export const Logo = () => {
           }}
           transition={{ duration: 0.18 }}
           className={cn(
-            "absolute left-5 top-1/2 -translate-y-1/2 font-medium text-neutral-700 dark:text-neutral-200 text-sm whitespace-pre transition-transform duration-150 group-hover/sidebar:translate-x-1",
+            "absolute left-0 top-1/2 -translate-y-1/2 font-medium text-neutral-700 dark:text-neutral-200 text-lg whitespace-pre transition-transform duration-150 group-hover/sidebar:translate-x-1",
             !open && "pointer-events-none"
           )}
         >
-          Bed Manager
+          Hello, {getFirstName(currentUser?.name)}
         </motion.span>
       </div>
     </div>
@@ -215,7 +223,7 @@ export const LogoIcon = () => (
 export const ProfileLink = () => {
   const { open, animate } = useSidebar();
   const currentUser = useSelector(selectCurrentUser);
-  
+
   // Get user initials for avatar
   const getInitials = (name) => {
     if (!name) return '?';
@@ -225,7 +233,7 @@ export const ProfileLink = () => {
     }
     return name.substring(0, 2).toUpperCase();
   };
-  
+
   return (
     <div className="group/sidebar flex items-center justify-start gap-2 py-4 px-3">
       <div className="h-8 w-8 rounded-full bg-sky-500 flex-shrink-0 flex items-center justify-center text-white text-xs font-semibold">
