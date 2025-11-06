@@ -8,7 +8,7 @@ import { motion } from "framer-motion"
 import { Home, User, MessageSquare } from "lucide-react"
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { restoreSession, selectIsAuthenticated } from '@/features/auth/authSlice'
+import { restoreSession, selectIsAuthenticated, selectAuthStatus } from '@/features/auth/authSlice'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 
@@ -16,6 +16,7 @@ function App() {
   const location = useLocation();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const authStatus = useSelector((state) => state.auth.status);
 
   // Restore session on app load
   useEffect(() => {
@@ -30,6 +31,18 @@ function App() {
 
   // Show floating nav on home page and login (when not authenticated)
   const shouldShowNav = !isAuthenticated;
+
+  // Wait for session to be restored before rendering routes
+  if (authStatus === 'idle' && location.pathname !== '/login') {
+    return (
+      <div className="dark bg-black text-white min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+          <p className="text-neutral-400">Restoring session...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dark bg-black text-white min-h-screen">
