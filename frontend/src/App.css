@@ -5,6 +5,19 @@
   text-align: center;
 }
 
+/* Hide scrollbar while keeping functionality */
+#root {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+#root::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
