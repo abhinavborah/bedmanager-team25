@@ -41,7 +41,7 @@ const Bed = React.memo(({
       // Animation props for visual feedback
       initial={{ opacity: 0, scale: 0.6 }}
       animate={{ opacity: 1, scale: 1 }}
-      whileHover={{ scale: isOccupied ? 1 : 1.03, y: isOccupied ? 0 : -3 }}
+      whileHover={isOccupied ? {} : {}}
       whileTap={{ scale: isOccupied ? 1 : 0.97 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}>
       {bed.number}
