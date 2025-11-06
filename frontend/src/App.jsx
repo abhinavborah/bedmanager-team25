@@ -17,11 +17,18 @@ function App() {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const authStatus = useSelector((state) => state.auth.status);
+  const [hasCheckedSession, setHasCheckedSession] = React.useState(false);
 
-  // Restore session on app load
+  // Restore session on app load (only once)
   useEffect(() => {
-    dispatch(restoreSession());
-  }, [dispatch]);
+    const checkSession = async () => {
+      await dispatch(restoreSession());
+      setHasCheckedSession(true);
+    };
+    if (!hasCheckedSession) {
+      checkSession();
+    }
+  }, [dispatch, hasCheckedSession]);
 
   const navItems = [
     { name: "Home", link: "/", icon: <Home className="h-4 w-4 text-neutral-500 dark:text-white" /> },
@@ -32,8 +39,8 @@ function App() {
   // Show floating nav on home page and login (when not authenticated)
   const shouldShowNav = !isAuthenticated;
 
-  // Wait for session to be restored before rendering routes
-  if (authStatus === 'idle' && location.pathname !== '/login') {
+  // Wait for session to be checked before rendering routes (except login page)
+  if (!hasCheckedSession && location.pathname !== '/login') {
     return (
       <div className="dark bg-black text-white min-h-screen flex items-center justify-center">
         <div className="text-center">
