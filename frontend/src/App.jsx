@@ -11,6 +11,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { restoreSession, selectIsAuthenticated, selectAuthStatus } from '@/features/auth/authSlice'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import ProtectedRoute from './components/ProtectedRoute'
+import AdminDashboard from './pages/AdminDashboard'
+import ManagerDashboard from './pages/ManagerDashboard'
+import StaffDashboard from './pages/StaffDashboard'
+import Unauthorized from './pages/Unauthorized'
 
 function App() {
   const location = useLocation();
@@ -65,6 +70,35 @@ function App() {
           path="/dashboard"
           element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
         />
+
+        {/* Role-Based Dashboard Routes */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['hospital_admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['manager']}>
+              <ManagerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['ward_staff']}>
+              <StaffDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Unauthorized Access Page */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
     </div>
   )
