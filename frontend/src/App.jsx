@@ -8,14 +8,20 @@ import { motion } from "framer-motion"
 import { Home, User, MessageSquare } from "lucide-react"
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { restoreSession, selectIsAuthenticated, selectAuthStatus } from '@/features/auth/authSlice'
+import { restoreSession, selectIsAuthenticated, selectAuthStatus, selectCurrentUser } from '@/features/auth/authSlice'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import ProtectedRoute from './components/ProtectedRoute'
+import AdminDashboard from './pages/AdminDashboard'
+import ManagerDashboard from './pages/ManagerDashboard'
+import StaffDashboard from './pages/StaffDashboard'
+import Unauthorized from './pages/Unauthorized'
 
 function App() {
   const location = useLocation();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const currentUser = useSelector(selectCurrentUser);
   const authStatus = useSelector((state) => state.auth.status);
   const [hasCheckedSession, setHasCheckedSession] = React.useState(false);
 
@@ -51,6 +57,21 @@ function App() {
     );
   }
 
+  // Helper function to get role-based redirect path
+  const getRoleDashboard = () => {
+    if (!currentUser) return '/dashboard';
+    switch (currentUser.role) {
+      case 'hospital_admin':
+        return '/admin/dashboard';
+      case 'manager':
+        return '/manager/dashboard';
+      case 'ward_staff':
+        return '/staff/dashboard';
+      default:
+        return '/dashboard';
+    }
+  };
+
   return (
     <div className="dark bg-black text-white min-h-screen">
       {shouldShowNav && <FloatingNav navItems={navItems} />}
@@ -58,13 +79,42 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         {/* Home page - landing page for unauthenticated users */}
-        <Route path="/" element={!isAuthenticated ? <HomePage /> : <Navigate to="/dashboard" />} />
+        <Route path="/" element={!isAuthenticated ? <HomePage /> : <Navigate to={getRoleDashboard()} />} />
 
         {/* Dashboard - only accessible when authenticated */}
         <Route
           path="/dashboard"
           element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
         />
+
+        {/* Role-Based Dashboard Routes */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['hospital_admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['manager']}>
+              <ManagerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['ward_staff']}>
+              <StaffDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Unauthorized Access Page */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
     </div>
   )
