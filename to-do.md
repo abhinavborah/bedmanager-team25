@@ -58,7 +58,7 @@
 
 ---
 
-### Task 1.4: Add Role-Based Route Guards
+### Task 1.4: Add Role-Based Route Guards✅
 
 **Assignee:** Shubham (Backend)  
 **Priority:** High  
