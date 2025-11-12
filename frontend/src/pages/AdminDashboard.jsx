@@ -1,87 +1,81 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { selectCurrentUser } from '@/features/auth/authSlice';
-import { Crown, BarChart3, Users, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import ExecutiveSummary from '@/components/ExecutiveSummary';
+import WardUtilizationReport from '@/components/WardUtilizationReport';
+import OccupancyTrendsChart from '@/components/OccupancyTrendsChart';
+import ForecastingInsights from '@/components/ForecastingInsights';
+import ReportGenerator from '@/components/ReportGenerator';
 
 const AdminDashboard = () => {
-  const currentUser = useSelector(selectCurrentUser);
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('overview');
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Crown className="w-8 h-8 text-yellow-500" />
-            <h1 className="text-4xl font-bold">Admin Dashboard</h1>
-          </div>
-          <p className="text-zinc-400">
-            Welcome, <span className="text-cyan-400">{currentUser?.name}</span>
-          </p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+            Admin Dashboard
+          </h1>
+          <p className="text-slate-400">Hospital-wide analytics and insights</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Overview Card */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 hover:border-cyan-500/50 transition-colors">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-lg bg-cyan-500/10">
-                <BarChart3 className="w-6 h-6 text-cyan-500" />
-              </div>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Hospital Overview</h3>
-            <p className="text-zinc-400 text-sm">
-              View hospital-wide statistics and analytics
-            </p>
-          </div>
+        {/* Executive Summary - Always Visible */}
+        <div className="mb-8">
+          <ExecutiveSummary />
+        </div>
 
-          {/* User Management Card */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 hover:border-cyan-500/50 transition-colors">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-lg bg-purple-500/10">
-                <Users className="w-6 h-6 text-purple-500" />
-              </div>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">User Management</h3>
-            <p className="text-zinc-400 text-sm">
-              Manage staff, roles, and permissions
-            </p>
-          </div>
-
-          {/* Settings Card */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 hover:border-cyan-500/50 transition-colors">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-lg bg-green-500/10">
-                <Settings className="w-6 h-6 text-green-500" />
-              </div>
-            </div>
-            <h3 className="text-xl font-semibold mb-2">System Settings</h3>
-            <p className="text-zinc-400 text-sm">
-              Configure hospital and system settings
-            </p>
+        {/* Tabbed Navigation */}
+        <div className="mb-6">
+          <div className="grid w-full grid-cols-4 gap-2 bg-slate-800/50 border border-slate-700 rounded-lg p-2">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'overview'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('trends')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'trends'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              Trends
+            </button>
+            <button
+              onClick={() => setActiveTab('forecasting')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'forecasting'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              Forecasting
+            </button>
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'reports'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              Reports
+            </button>
           </div>
         </div>
 
-        <div className="mt-8 bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4">Admin Capabilities</h2>
-          <ul className="space-y-2 text-zinc-300">
-            <li className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-cyan-500 rounded-full"></span>
-              Full access to all hospital data and analytics
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-cyan-500 rounded-full"></span>
-              User and role management across all wards
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-cyan-500 rounded-full"></span>
-              System configuration and settings
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-cyan-500 rounded-full"></span>
-              Reports and audit logs
-            </li>
-          </ul>
+        {/* Tab Content */}
+        <div className="space-y-6">
+          {activeTab === 'overview' && <WardUtilizationReport />}
+          {activeTab === 'trends' && <OccupancyTrendsChart />}
+          {activeTab === 'forecasting' && <ForecastingInsights />}
+          {activeTab === 'reports' && <ReportGenerator />}
         </div>
       </div>
     </div>
