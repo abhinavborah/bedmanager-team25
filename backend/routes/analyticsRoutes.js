@@ -7,7 +7,10 @@ const {
   getBedHistory,
   getOccupancyTrends,
   getForecasting,
-  getCleaningPerformance
+  getCleaningPerformance,
+  getOccupancyHistory,
+  getWardUtilization,
+  getPeakDemandAnalysis
 } = require('../controllers/analyticsController');
 const { validateObjectId } = require('../middleware/validators');
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -53,6 +56,25 @@ router.get('/forecasting', getForecasting);
  * Task 2.5b: Cleaning duration tracking and analytics
  */
 router.get('/cleaning-performance', protect, authorize('manager', 'hospital_admin'), getCleaningPerformance);
+
+/**
+ * GET /api/analytics/occupancy-history
+ * Get occupancy history with date range and granularity
+ * Query params: startDate (ISO), endDate (ISO), wardFilter (string), granularity (hourly|daily|weekly)
+ */
+router.get('/occupancy-history', getOccupancyHistory);
+
+/**
+ * GET /api/analytics/ward-utilization
+ * Get ward utilization with detailed metrics
+ */
+router.get('/ward-utilization', getWardUtilization);
+
+/**
+ * GET /api/analytics/peak-demand-analysis
+ * Get peak demand analysis with seasonal patterns and projections
+ */
+router.get('/peak-demand-analysis', getPeakDemandAnalysis);
 
 module.exports = router;
 

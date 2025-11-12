@@ -725,3 +725,411 @@ exports.getCleaningPerformance = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Get occupancy history with date range and granularity
+ * @route   GET /api/analytics/occupancy-history
+ * @access  Public
+ * @query   startDate (ISO string), endDate (ISO string), wardFilter (string), granularity ('hourly'|'daily'|'weekly', default: 'daily')
+ * @returns Time series data of occupancy changes aggregated from OccupancyLog
+ */
+exports.getOccupancyHistory = async (req, res) => {
+  try {
+    const { startDate, endDate, wardFilter, granularity = 'daily' } = req.query;
+
+    // Default to last 30 days if no dates provided
+    const end = endDate ? new Date(endDate) : new Date();
+    const start = startDate ? new Date(startDate) : new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    // Validate dates
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid date format. Use ISO 8601 format (e.g., 2025-11-01T00:00:00Z)'
+      });
+    }
+
+    if (start > end) {
+      return res.status(400).json({
+        success: false,
+        message: 'Start date must be before end date'
+      });
+    }
+
+    // Validate granularity
+    const validGranularities = ['hourly', 'daily', 'weekly'];
+    if (!validGranularities.includes(granularity)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid granularity. Must be one of: ${validGranularities.join(', ')}`
+      });
+    }
+
+    // Determine grouping format based on granularity
+    let dateFormat;
+    if (granularity === 'hourly') {
+      dateFormat = '%Y-%m-%d %H:00';
+    } else if (granularity === 'daily') {
+      dateFormat = '%Y-%m-%d';
+    } else if (granularity === 'weekly') {
+      dateFormat = '%Y-W%V';
+    }
+
+    // Build aggregation pipeline
+    const matchStage = {
+      timestamp: { $gte: start, $lte: end }
+    };
+
+    // Add ward filter if provided
+    if (wardFilter) {
+      const bedsInWard = await Bed.find({ ward: wardFilter }).distinct('_id');
+      matchStage.bedId = { $in: bedsInWard };
+    }
+
+    const history = await OccupancyLog.aggregate([
+      {
+        $match: matchStage
+      },
+      {
+        $lookup: {
+          from: 'beds',
+          localField: 'bedId',
+          foreignField: '_id',
+          as: 'bedDetails'
+        }
+      },
+      {
+        $unwind: { path: '$bedDetails', preserveNullAndEmptyArrays: true }
+      },
+      {
+        $group: {
+          _id: {
+            timePeriod: { $dateToString: { format: dateFormat, date: '$timestamp' } },
+            ward: '$bedDetails.ward'
+          },
+          totalChanges: { $sum: 1 },
+          assignedCount: {
+            $sum: { $cond: [{ $eq: ['$statusChange', 'assigned'] }, 1, 0] }
+          },
+          releasedCount: {
+            $sum: { $cond: [{ $eq: ['$statusChange', 'released'] }, 1, 0] }
+          },
+          maintenanceStartCount: {
+            $sum: { $cond: [{ $eq: ['$statusChange', 'maintenance_start'] }, 1, 0] }
+          },
+          maintenanceEndCount: {
+            $sum: { $cond: [{ $eq: ['$statusChange', 'maintenance_end'] }, 1, 0] }
+          },
+          reservedCount: {
+            $sum: { $cond: [{ $eq: ['$statusChange', 'reserved'] }, 1, 0] }
+          },
+          reservationCancelledCount: {
+            $sum: { $cond: [{ $eq: ['$statusChange', 'reservation_cancelled'] }, 1, 0] }
+          }
+        }
+      },
+      {
+        $sort: { '_id.timePeriod': 1, '_id.ward': 1 }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        timeRange: {
+          start: start.toISOString(),
+          end: end.toISOString(),
+          granularity
+        },
+        wardFilter: wardFilter || 'all',
+        history
+      }
+    });
+  } catch (error) {
+    console.error('Get occupancy history error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching occupancy history',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+/**
+ * @desc    Get ward utilization with detailed metrics
+ * @route   GET /api/analytics/ward-utilization
+ * @access  Public
+ * @returns Detailed ward-level metrics aggregated from OccupancyLog and Bed data
+ */
+exports.getWardUtilization = async (req, res) => {
+  try {
+    // Get all unique wards
+    const wards = await Bed.distinct('ward');
+
+    // For each ward, calculate detailed metrics
+    const utilizationData = await Promise.all(
+      wards.map(async (ward) => {
+        // Current bed status counts
+        const [totalBeds, occupied, available, maintenance, reserved] = await Promise.all([
+          Bed.countDocuments({ ward }),
+          Bed.countDocuments({ ward, status: 'occupied' }),
+          Bed.countDocuments({ ward, status: 'available' }),
+          Bed.countDocuments({ ward, status: 'maintenance' }),
+          Bed.countDocuments({ ward, status: 'reserved' })
+        ]);
+
+        // Calculate occupancy percentage
+        const occupancyPercentage = totalBeds > 0 ? Math.round((occupied / totalBeds) * 100) : 0;
+
+        // Get occupancy log data for the last 7 days
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const bedIds = await Bed.find({ ward }).distinct('_id');
+
+        const recentLogs = await OccupancyLog.find({
+          bedId: { $in: bedIds },
+          timestamp: { $gte: sevenDaysAgo }
+        }).lean();
+
+        // Calculate turnover rate (number of assigned + released events)
+        const turnoverCount = recentLogs.filter(
+          log => log.statusChange === 'assigned' || log.statusChange === 'released'
+        ).length;
+
+        // Calculate average turnaround time (time between released and next assigned)
+        const turnAroundTimes = [];
+        const sortedLogs = recentLogs.sort((a, b) => a.timestamp - b.timestamp);
+        
+        const bedLogGroups = {};
+        sortedLogs.forEach(log => {
+          const bedIdStr = log.bedId.toString();
+          if (!bedLogGroups[bedIdStr]) {
+            bedLogGroups[bedIdStr] = [];
+          }
+          bedLogGroups[bedIdStr].push(log);
+        });
+
+        Object.values(bedLogGroups).forEach(logs => {
+          for (let i = 0; i < logs.length - 1; i++) {
+            if (logs[i].statusChange === 'released' && logs[i + 1].statusChange === 'assigned') {
+              const turnAroundMs = logs[i + 1].timestamp - logs[i].timestamp;
+              const turnAroundHours = turnAroundMs / (1000 * 60 * 60);
+              turnAroundTimes.push(turnAroundHours);
+            }
+          }
+        });
+
+        const avgTurnAroundTime = turnAroundTimes.length > 0
+          ? Math.round((turnAroundTimes.reduce((sum, t) => sum + t, 0) / turnAroundTimes.length) * 10) / 10
+          : 0;
+
+        return {
+          ward,
+          totalBeds,
+          currentStatus: {
+            occupied,
+            available,
+            maintenance,
+            reserved
+          },
+          occupancyPercentage,
+          last7Days: {
+            totalStatusChanges: recentLogs.length,
+            turnoverCount,
+            avgTurnAroundTimeHours: avgTurnAroundTime,
+            assignedCount: recentLogs.filter(log => log.statusChange === 'assigned').length,
+            releasedCount: recentLogs.filter(log => log.statusChange === 'released').length,
+            maintenanceEvents: recentLogs.filter(
+              log => log.statusChange === 'maintenance_start' || log.statusChange === 'maintenance_end'
+            ).length
+          }
+        };
+      })
+    );
+
+    // Sort by occupancy percentage descending
+    utilizationData.sort((a, b) => b.occupancyPercentage - a.occupancyPercentage);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalWards: wards.length,
+        utilization: utilizationData
+      }
+    });
+  } catch (error) {
+    console.error('Get ward utilization error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching ward utilization',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+/**
+ * @desc    Get peak demand analysis with seasonal patterns and projections
+ * @route   GET /api/analytics/peak-demand-analysis
+ * @access  Public
+ * @returns Peak demand patterns, seasonal trends, and projections from OccupancyLog
+ */
+exports.getPeakDemandAnalysis = async (req, res) => {
+  try {
+    const now = new Date();
+    const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+
+    // Aggregate occupancy logs by hour of day and day of week
+    const hourlyPattern = await OccupancyLog.aggregate([
+      {
+        $match: {
+          timestamp: { $gte: ninetyDaysAgo },
+          statusChange: 'assigned'
+        }
+      },
+      {
+        $group: {
+          _id: { $hour: '$timestamp' },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { '_id': 1 }
+      }
+    ]);
+
+    // Aggregate by day of week
+    const dayOfWeekPattern = await OccupancyLog.aggregate([
+      {
+        $match: {
+          timestamp: { $gte: ninetyDaysAgo },
+          statusChange: 'assigned'
+        }
+      },
+      {
+        $group: {
+          _id: { $dayOfWeek: '$timestamp' },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { '_id': 1 }
+      }
+    ]);
+
+    // Map day numbers to names
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeekData = dayOfWeekPattern.map(item => ({
+      day: dayNames[item._id - 1],
+      dayNumber: item._id,
+      admissionCount: item.count
+    }));
+
+    // Find peak hours and days
+    const peakHour = hourlyPattern.reduce((max, item) => item.count > max.count ? item : max, { _id: 0, count: 0 });
+    const peakDay = dayOfWeekPattern.reduce((max, item) => item.count > max.count ? item : max, { _id: 0, count: 0 });
+
+    // Calculate monthly trends for seasonal patterns
+    const monthlyTrends = await OccupancyLog.aggregate([
+      {
+        $match: {
+          timestamp: { $gte: ninetyDaysAgo },
+          statusChange: 'assigned'
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$timestamp' },
+            month: { $month: '$timestamp' }
+          },
+          admissionCount: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { '_id.year': 1, '_id.month': 1 }
+      }
+    ]);
+
+    // Calculate average daily admissions
+    const totalAssignments = await OccupancyLog.countDocuments({
+      timestamp: { $gte: ninetyDaysAgo },
+      statusChange: 'assigned'
+    });
+    const avgDailyAdmissions = Math.round((totalAssignments / 90) * 10) / 10;
+
+    // Project next 7 days based on day-of-week pattern
+    const projections = [];
+    for (let i = 0; i < 7; i++) {
+      const projectedDate = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
+      const dayOfWeek = projectedDate.getDay() + 1; // MongoDB uses 1-7, JS uses 0-6
+      const dayPattern = dayOfWeekPattern.find(d => d._id === dayOfWeek) || { count: 0 };
+      const projectedAdmissions = Math.round((dayPattern.count / 90) * 7); // Scale to expected daily count
+
+      projections.push({
+        date: projectedDate.toISOString().split('T')[0],
+        dayOfWeek: dayNames[projectedDate.getDay()],
+        projectedAdmissions
+      });
+    }
+
+    // Calculate current total beds for capacity planning
+    const totalBeds = await Bed.countDocuments({});
+    const currentOccupied = await Bed.countDocuments({ status: 'occupied' });
+    const currentOccupancyRate = totalBeds > 0 ? Math.round((currentOccupied / totalBeds) * 100) : 0;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        analysisWindow: {
+          start: ninetyDaysAgo.toISOString(),
+          end: now.toISOString(),
+          days: 90
+        },
+        currentCapacity: {
+          totalBeds,
+          occupied: currentOccupied,
+          available: totalBeds - currentOccupied,
+          occupancyRate: currentOccupancyRate
+        },
+        peakDemand: {
+          peakHour: {
+            hour: peakHour._id,
+            timeRange: `${peakHour._id}:00 - ${peakHour._id + 1}:00`,
+            admissionCount: peakHour.count
+          },
+          peakDay: {
+            day: dayNames[peakDay._id - 1],
+            admissionCount: peakDay.count
+          },
+          avgDailyAdmissions
+        },
+        patterns: {
+          hourlyDistribution: hourlyPattern.map(item => ({
+            hour: item._id,
+            timeRange: `${item._id}:00 - ${item._id + 1}:00`,
+            admissionCount: item.count
+          })),
+          dayOfWeekDistribution: dayOfWeekData
+        },
+        seasonalTrends: {
+          monthlyData: monthlyTrends.map(item => ({
+            year: item._id.year,
+            month: item._id.month,
+            monthName: new Date(item._id.year, item._id.month - 1).toLocaleString('default', { month: 'long' }),
+            admissionCount: item.admissionCount
+          }))
+        },
+        projections: {
+          next7Days: projections,
+          methodology: 'Based on historical day-of-week admission patterns from last 90 days'
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Get peak demand analysis error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching peak demand analysis',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
