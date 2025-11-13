@@ -103,7 +103,7 @@ export default function LoginCardSection() {
       {/* Header removed: branding and contact button intentionally omitted */}
       {/* Centered Login Card with Tabs (Login / Sign Up) */}
       <div className="min-h-screen w-full grid place-items-center px-4 pt-12 pb-8">
-        <Card className="relative z-[5100] card-animate w-full max-w-md border border-neutral-200/5 bg-white/5 dark:border-neutral-700 dark:bg-neutral-900/60 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/60">
+        <Card className="relative z-[5100] card-animate w-full max-w-md lg:max-w-3xl border border-neutral-200/5 bg-white/5 dark:border-neutral-700 dark:bg-neutral-900/60 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/60">
           <CardHeader className="space-y-1 text-left pl-4 pr-4 pt-6">
             <CardTitle className="text-2xl">Welcome</CardTitle>
             <CardDescription className="text-zinc-400">Log in or create an account</CardDescription>
@@ -208,87 +208,97 @@ export default function LoginCardSection() {
 
                 {activeTab === "signup" && (
                   <div className="tab-panel space-y-5">
-                    <div className="grid gap-2 text-left">
-                      <Label htmlFor="role" className="text-zinc-300">Role</Label>
-                      <Select value={role} onValueChange={setRole}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="technical_team">Technical/IT Team</SelectItem>
-                          <SelectItem value="hospital_admin">Hospital Admin</SelectItem>
-                          <SelectItem value="er_staff">ER Staff</SelectItem>
-                          <SelectItem value="ward_staff">Ward Staff</SelectItem>
-                          <SelectItem value="manager">Manager</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {errors.role && <p className="text-xs text-red-400 mt-1">{errors.role}</p>}
-                    </div>
+                    {/* Two-column layout on desktop, single column on mobile */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                      {/* Left Column: Role, Ward, Department */}
+                      <div className="space-y-5">
+                        <div className="grid gap-2 text-left">
+                          <Label htmlFor="role" className="text-zinc-300">Role</Label>
+                          <Select value={role} onValueChange={setRole}>
+                            <SelectTrigger className="w-full h-10">
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="technical_team">Technical/IT Team</SelectItem>
+                              <SelectItem value="hospital_admin">Hospital Admin</SelectItem>
+                              <SelectItem value="er_staff">ER Staff</SelectItem>
+                              <SelectItem value="ward_staff">Ward Staff</SelectItem>
+                              <SelectItem value="manager">Manager</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {errors.role && <p className="text-xs text-red-400 mt-1">{errors.role}</p>}
+                        </div>
 
-                    {/* Ward Selection - Required for ward_staff and manager */}
-                    {(role === 'ward_staff' || role === 'manager') && (
-                      <div className="grid gap-2 text-left">
-                        <Label htmlFor="ward" className="text-zinc-300">
-                          Ward <span className="text-red-400">*</span>
-                        </Label>
-                        <Select value={ward} onValueChange={setWard}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select ward" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ICU">ICU</SelectItem>
-                            <SelectItem value="General">General</SelectItem>
-                            <SelectItem value="Emergency">Emergency</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {errors.ward && <p className="text-xs text-red-400 mt-1">{errors.ward}</p>}
+                        {/* Ward Selection - Required for ward_staff and manager */}
+                        {(role === 'ward_staff' || role === 'manager') && (
+                          <div className="grid gap-2 text-left">
+                            <Label htmlFor="ward" className="text-zinc-300">
+                              Ward <span className="text-red-400">*</span>
+                            </Label>
+                            <Select value={ward} onValueChange={setWard}>
+                              <SelectTrigger className="w-full h-10">
+                                <SelectValue placeholder="Select ward" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="ICU">ICU</SelectItem>
+                                <SelectItem value="General">General</SelectItem>
+                                <SelectItem value="Emergency">Emergency</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            {errors.ward && <p className="text-xs text-red-400 mt-1">{errors.ward}</p>}
+                          </div>
+                        )}
+
+                        {/* Department - Optional for all roles */}
+                        <div className="grid gap-2 text-left">
+                          <Label htmlFor="department" className="text-zinc-300">Department (Optional)</Label>
+                          <Input
+                            id="department"
+                            type="text"
+                            placeholder="e.g., Cardiology, Surgery"
+                            value={department}
+                            onChange={(e) => setDepartment(e.target.value)}
+                            className="h-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600"
+                          />
+                          {errors.department && <p className="text-xs text-red-400 mt-1">{errors.department}</p>}
+                        </div>
                       </div>
-                    )}
 
-                    {/* Department - Optional for all roles */}
-                    <div className="grid gap-2 text-left">
-                      <Label htmlFor="department" className="text-zinc-300">Department (Optional)</Label>
-                      <Input
-                        id="department"
-                        type="text"
-                        placeholder="e.g., Cardiology, Surgery"
-                        value={department}
-                        onChange={(e) => setDepartment(e.target.value)}
-                        className="bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600"
-                      />
-                      {errors.department && <p className="text-xs text-red-400 mt-1">{errors.department}</p>}
-                    </div>
+                      {/* Right Column: Name, Email, Password */}
+                      <div className="space-y-5">
+                        <div className="grid gap-2 text-left">
+                          <Label htmlFor="name" className="text-zinc-300">Full Name</Label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                            <Input ref={nameRef} id="name" type="text" placeholder="John Doe" className="h-10 pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
+                          </div>
+                          {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
+                        </div>
 
-                    <div className="grid gap-2 text-left">
-                      <Label htmlFor="name" className="text-zinc-300">Full Name</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                        <Input ref={nameRef} id="name" type="text" placeholder="John Doe" className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
+                        <div className="grid gap-2 text-left">
+                          <Label htmlFor="signup-email" className="text-zinc-300">Email</Label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                            <Input ref={signupEmailRef} id="signup-email" type="email" placeholder="you@example.com" className="h-10 pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
+                          </div>
+                          {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
+                        </div>
+
+                        <div className="grid gap-2 text-left">
+                          <Label htmlFor="signup-password" className="text-zinc-300">Password</Label>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                            <Input ref={signupPwRef} id="signup-password" type={showSignupPw ? "text" : "password"} placeholder="••••••••" className="h-10 pl-10 pr-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
+                            <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md text-zinc-400 hover:text-zinc-200" onClick={() => setShowSignupPw(v => !v)} aria-label={showSignupPw ? "Hide password" : "Show password"}>
+                              {showSignupPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                          </div>
+                          {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
+                        </div>
                       </div>
-                      {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
                     </div>
 
-                    <div className="grid gap-2 text-left">
-                      <Label htmlFor="signup-email" className="text-zinc-300">Email</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                        <Input ref={signupEmailRef} id="signup-email" type="email" placeholder="you@example.com" className="pl-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
-                      </div>
-                      {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
-                    </div>
-
-                    <div className="grid gap-2 text-left">
-                      <Label htmlFor="signup-password" className="text-zinc-300">Password</Label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                        <Input ref={signupPwRef} id="signup-password" type={showSignupPw ? "text" : "password"} placeholder="••••••••" className="pl-10 pr-10 bg-zinc-950 border-zinc-800 text-zinc-50 placeholder:text-zinc-600" />
-                        <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md text-zinc-400 hover:text-zinc-200" onClick={() => setShowSignupPw(v => !v)} aria-label={showSignupPw ? "Hide password" : "Show password"}>
-                          {showSignupPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                        </button>
-                      </div>
-                      {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
-                    </div>
-
+                    {/* Agreement and Button - Full Width */}
                     <div className="flex items-center gap-2">
                       <Checkbox checked={termsChecked} onCheckedChange={setTermsChecked} id="terms" className="border-zinc-700 data-[state=checked]:bg-zinc-50 data-[state=checked]:text-zinc-900" />
                       <Label htmlFor="terms" className="text-zinc-400 text-sm">I agree to the Terms & Privacy</Label>
