@@ -17,6 +17,7 @@
 - Store ward info in Redux auth state
 
 **Note:** The `manager` role is ward-specific:
+
 - Manager + Ward=ICU → ICU Manager (manages ICU beds)
 - Manager + Ward=General → General Manager (manages General ward beds)
 - Manager + Ward=Emergency → Emergency Manager (manages Emergency ward beds)
@@ -36,6 +37,7 @@
 - Add Socket.io events: `emergencyRequestCreated`, `emergencyRequestApproved`, `emergencyRequestRejected`
 
 **Implementation Complete:** ✅
+
 - Model: `models/EmergencyRequest.js` with patientId, location, status, description
 - Controller: `controllers/emergencyRequestController.js` with full CRUD operations
 - Routes: `routes/emergencyRequestRoutes.js` with REST endpoints
@@ -44,7 +46,7 @@
 
 ---
 
-### Task 1.3: Create Alert/Notification Model✅
+### Task 1.3: Create Alert/Notification Model ✅
 
 **Assignee:** Nilkanta (Backend)  
 **Priority:** High  
@@ -58,7 +60,7 @@
 
 ---
 
-### Task 1.4: Add Role-Based Route Guards✅
+### Task 1.4: Add Role-Based Route Guards ✅
 
 **Assignee:** Shubham (Backend)  
 **Priority:** High  
@@ -106,7 +108,7 @@
 
 ---
 
-### Task 1.7: Setup Role-Based Route Middleware (Frontend).   ✅
+### Task 1.7: Setup Role-Based Route Middleware (Frontend). ✅
 
 **Assignee:** Abhinav (Frontend)  
 **Priority:** High  
@@ -121,7 +123,7 @@
 
 ---
 
-## Phase 2: Manager Dashboard (Ward-Specific: ICU/General/Emergency)                  ✅
+## Phase 2: Manager Dashboard (Ward-Specific: ICU/General/Emergency) ✅
 
 ### Task 2.1: Create Manager Dashboard Layout
 
@@ -174,7 +176,7 @@
 
 ---
 
-### Task 2.4: Forecasting Data & Display.                       ✅
+### Task 2.4: Forecasting Data & Display. ✅
 
 **Assignee:** Shubham (Backend)  
 **Priority:** Medium  
@@ -191,7 +193,7 @@
 
 ---
 
-### Task 2.5: Bed Occupant Details & Patient Status Dashboard                ✅
+### Task 2.5: Bed Occupant Details & Patient Status Dashboard ✅
 
 **Assignee:** Abhinav (Frontend - Dashboard Integration)  
 **Priority:** High  
@@ -229,7 +231,7 @@
 
 ---
 
-### Task 2.5c: Bed Metadata & Editing                    ✅
+### Task 2.5c: Bed Metadata & Editing ✅
 
 **Assignee:** Diganta (Frontend)  
 **Priority:** Medium  
@@ -247,7 +249,8 @@
 
 ---
 
-### Task 2.6: WebSocket Events for Real-time Sync         ✅     
+### Task 2.6: WebSocket Events for Real-time Sync ✅
+
 **Assignee:** Nilkanta (Backend)  
 **Priority:** High  
 **Dependencies:** Task 1.2, 1.3, 2.2, 2.3, 2.5b  
@@ -334,7 +337,7 @@
 
 ---
 
-### Task 4.2: Backend Ward Staff Authorization
+### Task 4.2: Backend Ward Staff Authorization ✅
 
 **Assignee:** Nilkanta (Backend)  
 **Priority:** High  
@@ -350,7 +353,7 @@
 
 ---
 
-### Task 4.3: Mobile-Optimized UI
+### Task 4.3: Mobile-Optimized UI ✅
 
 **Assignee:** Shubham (Frontend - Minor)  
 **Priority:** Medium  
@@ -368,7 +371,7 @@
 
 ## Phase 5: ER Staff Request System
 
-### Task 5.1: Create ER Staff Dashboard
+### Task 5.1: Create ER Staff Dashboard ✅
 
 **Assignee:** Abhinav (Frontend - Simpler Dashboard)  
 **Priority:** High  
@@ -385,7 +388,7 @@
 
 ---
 
-### Task 5.2: Emergency Request Submission Flow
+### Task 5.2: Emergency Request Submission Flow ✅
 
 **Assignee:** Surjit (Backend - Integration)  
 **Priority:** High  
@@ -401,7 +404,7 @@
 
 ---
 
-### Task 5.3: Real-time Notification System
+### Task 5.3: Real-time Notification System ✅
 
 **Assignee:** Diganta (Backend)  
 **Priority:** High  
@@ -417,7 +420,7 @@
 
 ---
 
-### Task 5.4: Availability Auto-refresh
+### Task 5.4: Availability Auto-refresh ✅
 
 **Assignee:** Nilkanta (Frontend - Minor)  
 **Priority:** Low  
@@ -432,7 +435,7 @@
 
 ---
 
-## Phase 6: Integration & Polish
+## Phase 6: Integration & Polish  
 
 ### Task 6.1: Cross-Role Testing & Workflow
 
