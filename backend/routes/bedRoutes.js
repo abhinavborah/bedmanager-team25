@@ -28,7 +28,7 @@ router.get('/:id/occupant-history', protect, getOccupantHistory); // Task 2.5: G
 
 // Protected write routes (requires JWT authentication + role-based guards)
 router.patch('/:id/status', protect, canUpdateBedStatus, validateUpdateBedStatus, updateBedStatus);
-router.put('/:id/cleaning/mark-complete', protect, authorize('manager', 'hospital_admin'), markCleaningComplete); // Task 2.5b: Mark cleaning complete
+router.put('/:id/cleaning/mark-complete', protect, authorize('manager', 'hospital_admin', 'ward_staff'), markCleaningComplete); // Task 2.5b: Mark cleaning complete - ward staff can mark beds as clean
 router.patch('/:id/discharge-time', protect, authorize('manager', 'hospital_admin'), updateDischargeTime); // Update estimated discharge time
 
 module.exports = router;
