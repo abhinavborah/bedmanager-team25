@@ -61,7 +61,7 @@ const OccupantStatusDashboard = () => {
     return (
       <DashboardLayout>
         <div className="max-w-7xl mx-auto">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-12 flex items-center justify-center">
+          <div className="bg-neutral-900 border border-zinc-800 rounded-lg p-12 flex items-center justify-center">
             <div className="text-center">
               <RefreshCw className="w-12 h-12 text-cyan-500 animate-spin mx-auto mb-4" />
               <p className="text-zinc-400">Loading occupant data...</p>
@@ -98,7 +98,7 @@ const OccupantStatusDashboard = () => {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+          <div className="bg-neutral-900 border border-zinc-800 rounded-lg p-6">
             <div className="flex items-center gap-3">
               <div className="bg-cyan-500/10 p-3 rounded-lg">
                 <Bed className="w-6 h-6 text-cyan-500" />
@@ -110,7 +110,7 @@ const OccupantStatusDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+          <div className="bg-neutral-900 border border-zinc-800 rounded-lg p-6">
             <div className="flex items-center gap-3">
               <div className="bg-blue-500/10 p-3 rounded-lg">
                 <TrendingUp className="w-6 h-6 text-blue-500" />
@@ -124,7 +124,7 @@ const OccupantStatusDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+          <div className="bg-neutral-900 border border-zinc-800 rounded-lg p-6">
             <div className="flex items-center gap-3">
               <div className="bg-yellow-500/10 p-3 rounded-lg">
                 <AlertCircle className="w-6 h-6 text-yellow-500" />
@@ -138,7 +138,7 @@ const OccupantStatusDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+          <div className="bg-neutral-900 border border-zinc-800 rounded-lg p-6">
             <div className="flex items-center gap-3">
               <div className="bg-purple-500/10 p-3 rounded-lg">
                 <Users className="w-6 h-6 text-purple-500" />
@@ -153,7 +153,7 @@ const OccupantStatusDashboard = () => {
 
         {/* Ward Summary */}
         {summary.length > 0 && (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+          <div className="bg-neutral-900 border border-zinc-800 rounded-lg p-6">
             <h2 className="text-white text-xl font-bold mb-4">Ward Summary</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {summary.map((ward) => (
@@ -185,7 +185,7 @@ const OccupantStatusDashboard = () => {
         )}
 
         {/* Occupant Table */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
+        <div className="bg-neutral-900 border border-zinc-800 rounded-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-white text-xl font-bold">All Occupied Beds</h2>
             {lastUpdated && (
@@ -194,7 +194,7 @@ const OccupantStatusDashboard = () => {
               </p>
             )}
           </div>
-          
+
           {occupiedBeds.length === 0 ? (
             <div className="text-center py-12">
               <Bed className="w-16 h-16 text-zinc-700 mx-auto mb-4" />

@@ -385,7 +385,7 @@ function Dashboard() {
             {/* Settings Modal */}
             {showSettings && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowSettings(false)}>
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="bg-neutral-900 border border-zinc-800 rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl font-bold text-white">User Profile</h2>
                             <button
