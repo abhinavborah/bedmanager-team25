@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, logout } from '@/features/auth/authSlice';
-import { 
-  Home, 
-  BedDouble, 
-  Users, 
-  BarChart2, 
-  FileText, 
-  Settings, 
-  LogOut, 
+import {
+  Home,
+  BedDouble,
+  Users,
+  BarChart2,
+  FileText,
+  Settings,
+  LogOut,
   ClipboardList,
   Shield,
   TrendingUp
@@ -37,7 +37,7 @@ const DashboardLayout = ({ children }) => {
   // Define links based on user role
   const getLinksForRole = () => {
     const role = currentUser?.role;
-    
+
     const commonLinks = [
       {
         label: 'Settings',
@@ -63,26 +63,28 @@ const DashboardLayout = ({ children }) => {
             href: '/manager/dashboard',
             icon: <Home className="h-5 w-5" />,
           },
-          {
-            label: 'Bed Management',
-            href: '/manager/dashboard',
-            icon: <BedDouble className="h-5 w-5" />,
-          },
+          // Temporarily hidden - uncomment when needed
+          // {
+          //   label: 'Bed Management',
+          //   href: '/manager/dashboard',
+          //   icon: <BedDouble className="h-5 w-5" />,
+          // },
           {
             label: 'Occupant Status',
             href: '/manager/occupants',
             icon: <Users className="h-5 w-5" />,
           },
-          {
-            label: 'Reports',
-            href: '/reports',
-            icon: <FileText className="h-5 w-5" />,
-          },
-          {
-            label: 'Analytics',
-            href: '#analytics',
-            icon: <BarChart2 className="h-5 w-5" />,
-          },
+          // Temporarily hidden - uncomment when needed
+          // {
+          //   label: 'Reports',
+          //   href: '/reports',
+          //   icon: <FileText className="h-5 w-5" />,
+          // },
+          // {
+          //   label: 'Analytics',
+          //   href: '#analytics',
+          //   icon: <BarChart2 className="h-5 w-5" />,
+          // },
           ...commonLinks,
         ];
 
