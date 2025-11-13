@@ -88,7 +88,7 @@ const BedStatusGrid = ({ ward, onBedClick }) => {
         </p>
       </div>
 
-      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-3">
         {filteredBeds.map((bed) => {
           const isCleaningStatus = bed.status === 'cleaning';
           return (
