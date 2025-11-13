@@ -99,7 +99,7 @@ const ErStaffDashboard = () => {
           <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-white">ER Staff Dashboard</h1>
+                <h1 className="text-3xl font-bold text-white text-left">ER Staff Dashboard</h1>
                 <p className="text-slate-400 mt-1">
                   Emergency bed availability and request management
                 </p>

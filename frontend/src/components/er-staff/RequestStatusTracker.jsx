@@ -137,7 +137,7 @@ const RequestStatusTracker = forwardRef((props, ref) => {
               key={request._id}
               className={`border rounded-lg p-4 ${getStatusColor(request.status)}`}
             >
-              <div className="flex items-start justify-between mb-2">
+              <div className="flex items-start justify-between mb-2 text-left">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     {getStatusIcon(request.status)}
