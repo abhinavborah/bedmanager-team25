@@ -125,12 +125,15 @@ const WardStaffDashboard = () => {
           </div>
         )}
 
-        {/* Task 4.3: Mobile-optimized header with responsive text sizing */}
-        <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-3 sm:p-4">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1 sm:mb-2">
-            Ward Staff Dashboard
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <svg className="w-8 h-8 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <h1 className="text-4xl font-bold">Ward Staff Dashboard</h1>
+          </div>
+          <p className="text-zinc-400">
             {assignedWard || 'No ward assigned'} • Total: {bedsList.length} • Ward: {wardBeds.length}
             {lastUpdateTime && online && (
               <span className="ml-2 text-green-400">● Live</span>
