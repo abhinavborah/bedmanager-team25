@@ -101,7 +101,7 @@ const ForecastingPanel = ({ ward }) => {
 
   if (loading && !forecastData) {
     return (
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="w-6 h-6 text-cyan-500" />
           <h2 className="text-2xl font-bold text-white">Forecasting & Insights</h2>
@@ -113,7 +113,7 @@ const ForecastingPanel = ({ ward }) => {
 
   if (error) {
     return (
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="w-6 h-6 text-cyan-500" />
           <h2 className="text-2xl font-bold text-white">Forecasting & Insights</h2>
@@ -127,7 +127,7 @@ const ForecastingPanel = ({ ward }) => {
   // Accept data if we have currentMetrics OR wardForecasts
   if (!forecastData || (!forecastData.currentMetrics && (!forecastData.wardForecasts || forecastData.wardForecasts.length === 0))) {
     return (
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="w-6 h-6 text-cyan-500" />
           <h2 className="text-2xl font-bold text-white">Forecasting & Insights</h2>
@@ -247,7 +247,7 @@ const ForecastingPanel = ({ ward }) => {
   };
 
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+    <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <TrendingUp className="w-6 h-6 text-cyan-500" />
@@ -386,8 +386,8 @@ const ForecastingPanel = ({ ward }) => {
               <div
                 key={index}
                 className={`flex items-start gap-3 p-3 rounded ${insight.type === 'warning'
-                    ? 'bg-yellow-500/10 border-l-2 border-yellow-500'
-                    : 'bg-blue-500/10 border-l-2 border-blue-500'
+                  ? 'bg-yellow-500/10 border-l-2 border-yellow-500'
+                  : 'bg-blue-500/10 border-l-2 border-blue-500'
                   }`}
               >
                 <Info
@@ -552,8 +552,8 @@ const ForecastingPanel = ({ ward }) => {
                 <div
                   key={index}
                   className={`flex items-center justify-between py-2 px-3 rounded border transition-all ${isManual
-                      ? 'bg-gradient-to-r from-cyan-900/30 to-cyan-800/20 border-cyan-800/50 hover:border-cyan-600/50'
-                      : 'bg-neutral-900/30 border-neutral-800/50 hover:border-neutral-700'
+                    ? 'bg-gradient-to-r from-cyan-900/30 to-cyan-800/20 border-cyan-800/50 hover:border-cyan-600/50'
+                    : 'bg-neutral-900/30 border-neutral-800/50 hover:border-neutral-700'
                     }`}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -641,10 +641,10 @@ const ForecastingPanel = ({ ward }) => {
               <div className="w-full bg-neutral-900 rounded-full h-2 overflow-hidden mt-2">
                 <div
                   className={`h-full transition-all ${displayMetrics.projectedOccupancy > 90
-                      ? 'bg-red-500'
-                      : displayMetrics.projectedOccupancy > 75
-                        ? 'bg-yellow-500'
-                        : 'bg-green-500'
+                    ? 'bg-red-500'
+                    : displayMetrics.projectedOccupancy > 75
+                      ? 'bg-yellow-500'
+                      : 'bg-green-500'
                     }`}
                   style={{ width: `${displayMetrics.projectedOccupancy}%` }}
                 />

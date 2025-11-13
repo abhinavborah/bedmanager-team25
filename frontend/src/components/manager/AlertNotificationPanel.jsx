@@ -84,7 +84,7 @@ const AlertNotificationPanel = ({ ward }) => {
 
   if (status === 'loading') {
     return (
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
         <h2 className="text-2xl font-bold text-white mb-4">Alerts & Notifications</h2>
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
@@ -99,7 +99,7 @@ const AlertNotificationPanel = ({ ward }) => {
   }
 
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+    <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-white">Alerts & Notifications</h2>
         {filteredAlerts.length > 0 && (

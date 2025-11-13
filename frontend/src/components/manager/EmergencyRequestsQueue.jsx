@@ -189,7 +189,7 @@ const EmergencyRequestsQueue = ({ ward, onApprovalSuccess }) => {
 
   if (status === 'loading') {
     return (
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
         <h2 className="text-2xl font-bold text-white mb-4">Emergency Requests</h2>
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
@@ -204,7 +204,7 @@ const EmergencyRequestsQueue = ({ ward, onApprovalSuccess }) => {
   }
 
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+    <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-white">Emergency Requests</h2>
         {filteredRequests.filter((r) => r.status === 'pending').length > 0 && (

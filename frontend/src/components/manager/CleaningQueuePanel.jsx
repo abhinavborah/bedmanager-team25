@@ -98,7 +98,7 @@ const CleaningQueuePanel = ({ ward }) => {
 
   if (status === 'loading') {
     return (
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
           <Sparkles className="w-6 h-6 text-purple-500" />
           <h2 className="text-xl sm:text-2xl font-bold text-white">Cleaning Queue</h2>
@@ -112,7 +112,7 @@ const CleaningQueuePanel = ({ ward }) => {
 
   if (error) {
     return (
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
           <Sparkles className="w-6 h-6 text-purple-500" />
           <h2 className="text-xl sm:text-2xl font-bold text-white">Cleaning Queue</h2>
@@ -127,7 +127,7 @@ const CleaningQueuePanel = ({ ward }) => {
 
   if (!queueData || queueData.beds.length === 0) {
     return (
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Sparkles className="w-6 h-6 text-purple-500" />
@@ -144,7 +144,7 @@ const CleaningQueuePanel = ({ ward }) => {
   }
 
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+    <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
       {/* Header with bed count */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">

@@ -60,13 +60,13 @@ const BedStatusGrid = ({ ward, onBedClick }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case 'available':
-        return 'bg-green-500 hover:bg-green-600';
+        return 'bg-green-500/20 border-2 border-green-500 text-green-400 hover:bg-green-500/30';
       case 'occupied':
-        return 'bg-red-500 hover:bg-red-600';
+        return 'bg-red-500/20 border-2 border-red-500 text-red-400 hover:bg-red-500/30';
       case 'cleaning':
-        return 'bg-orange-500 hover:bg-orange-600';
+        return 'bg-orange-500/20 border-2 border-orange-500 text-orange-400 hover:bg-orange-500/30';
       default:
-        return 'bg-neutral-900 hover:bg-zinc-600';
+        return 'bg-neutral-900 border-2 border-neutral-700 text-neutral-400 hover:bg-neutral-800';
     }
   };
 
@@ -96,7 +96,7 @@ const BedStatusGrid = ({ ward, onBedClick }) => {
         onClick={() => onBedClick && onBedClick(bed)}
         className={`
           ${getStatusColor(bed.status)}
-          text-white font-semibold rounded-lg p-4
+          font-semibold rounded-lg p-4
           transition-all duration-200 transform hover:scale-105
           focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-zinc-900
           flex flex-col items-center justify-center
@@ -104,7 +104,7 @@ const BedStatusGrid = ({ ward, onBedClick }) => {
         `}
         title={`${bed.bedId} - ${getStatusLabel(bed.status)}${isCleaningStatus ? ' (Ward Staff Only)' : ''}`}
       >
-        <span className="text-lg">{bed.bedId}</span>
+        <span className="text-lg font-bold">{bed.bedId}</span>
         {bed.patientName && (
           <span className="text-xs mt-1 truncate w-full text-center opacity-80">
             {bed.patientName}
@@ -126,7 +126,7 @@ const BedStatusGrid = ({ ward, onBedClick }) => {
 
   if (status === 'loading') {
     return (
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500"></div>
         </div>
@@ -136,14 +136,14 @@ const BedStatusGrid = ({ ward, onBedClick }) => {
 
   if (filteredBeds.length === 0) {
     return (
-      <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
         <p className="text-zinc-400 text-center">No beds found for this ward.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+    <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h2 className="text-2xl font-bold text-white">Bed Status Grid</h2>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 text-sm">
