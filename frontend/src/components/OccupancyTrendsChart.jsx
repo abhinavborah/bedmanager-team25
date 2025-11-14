@@ -221,25 +221,25 @@ const OccupancyTrendsChart = () => {
           <div className="relative h-64 bg-neutral-900 rounded-lg border border-neutral-700 p-4">
             <div className="h-full flex items-end justify-around gap-2">
               {currentData.map((item, index) => {
-                const heightPercentage = (item.occupancy / 100) * 100;
+                const heightPercentage = item.occupancy;
                 const isHighOccupancy = item.occupancy >= 90;
 
                 return (
-                  <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                    <div className="w-full relative group">
+                  <div key={index} className="flex-1 flex flex-col items-center gap-2 h-full">
+                    <div className="w-full relative group flex items-end h-full">
                       <div
                         className={`w-full rounded-t-lg transition-all ${isHighOccupancy
                           ? 'bg-gradient-to-t from-red-600 to-red-400'
                           : 'bg-gradient-to-t from-blue-600 to-blue-400'
                           }`}
-                        style={{ height: `${heightPercentage}%`, minHeight: '20px' }}
+                        style={{ height: `${heightPercentage}%`, minHeight: item.occupancy === 0 ? '0px' : '4px' }}
                       >
-                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-neutral-950 px-2 py-1 rounded text-xs whitespace-nowrap border border-neutral-700">
-                          {item.occupancy}%
-                        </div>
                       </div>
                     </div>
-                    <span className="text-xs text-neutral-400 mt-1">{item.day}</span>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span className="text-xs text-neutral-400">{item.day}</span>
+                      <span className="text-xs font-medium text-white">({item.occupancy}%)</span>
+                    </div>
                   </div>
                 );
               })}
