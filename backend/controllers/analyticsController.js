@@ -7,13 +7,16 @@ const CleaningLog = require('../models/CleaningLog');
 const mongoose = require('mongoose');
 
 /**
- * @desc    Get occupancy summary for all beds
+ * @desc    Get occupancy summary for all beds with week-over-week comparison
  * @route   GET /api/analytics/occupancy-summary
  * @access  Public
- * @returns { totalBeds, occupied, available, maintenance, reserved, occupancyPercentage }
+ * @returns { totalBeds, occupied, available, maintenance, reserved, occupancyPercentage, weekOverWeek }
  */
 exports.getOccupancySummary = async (req, res) => {
   try {
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
     // Count beds by status (only 3 statuses now: available, cleaning, occupied)
     const [totalBeds, occupied, available, cleaning] = await Promise.all([
       Bed.countDocuments({}),
@@ -25,13 +28,53 @@ exports.getOccupancySummary = async (req, res) => {
     // Calculate occupancy percentage
     const occupancyPercentage = totalBeds > 0 ? Math.round((occupied / totalBeds) * 100) : 0;
 
+    // Get occupancy logs from last week to calculate historical average
+    const oneWeekLogs = await OccupancyLog.find({
+      timestamp: { $gte: oneWeekAgo, $lte: now },
+      statusChange: { $in: ['assigned', 'released'] }
+    }).lean();
+
+    // Count assigned vs released in the last week
+    const assignedLastWeek = oneWeekLogs.filter(log => log.statusChange === 'assigned').length;
+    const releasedLastWeek = oneWeekLogs.filter(log => log.statusChange === 'released').length;
+    
+    // Get data from two weeks ago for comparison
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+    const twoWeekLogs = await OccupancyLog.find({
+      timestamp: { $gte: twoWeeksAgo, $lt: oneWeekAgo },
+      statusChange: { $in: ['assigned', 'released'] }
+    }).lean();
+
+    const assignedTwoWeeksAgo = twoWeekLogs.filter(log => log.statusChange === 'assigned').length;
+    const releasedTwoWeeksAgo = twoWeekLogs.filter(log => log.statusChange === 'released').length;
+
+    // Calculate net change (assigned - released)
+    const netChangeLastWeek = assignedLastWeek - releasedLastWeek;
+    const netChangeTwoWeeksAgo = assignedTwoWeeksAgo - releasedTwoWeeksAgo;
+    
+    // Calculate week-over-week changes
+    const occupiedChange = netChangeLastWeek - netChangeTwoWeeksAgo;
+    const availableChange = -occupiedChange; // Available moves opposite to occupied
+    
+    // Calculate occupancy rate change
+    const historicalOccupancyRate = totalBeds > 0 
+      ? Math.round(((occupied - netChangeLastWeek) / totalBeds) * 100) 
+      : 0;
+    const occupancyRateChange = occupancyPercentage - historicalOccupancyRate;
+
     res.status(200).json({
       success: true,
       totalBeds,
       occupiedBeds: occupied,
       availableBeds: available,
       cleaningBeds: cleaning,
-      occupancyRate: occupancyPercentage
+      occupancyRate: occupancyPercentage,
+      weekOverWeek: {
+        totalBedsChange: 0, // Beds don't change week to week typically
+        occupiedChange,
+        availableChange,
+        occupancyRateChange: `${occupancyRateChange >= 0 ? '+' : ''}${occupancyRateChange}%`
+      }
     });
   } catch (error) {
     console.error('Get occupancy summary error:', error);

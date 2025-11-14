@@ -21,12 +21,16 @@ const ExecutiveSummary = () => {
     const fetchAnalytics = async () => {
       try {
         const response = await api.get('/analytics/occupancy-summary');
-        setAnalyticsData(response.data.data.summary);
+        setAnalyticsData(response.data);
       } catch (error) {
         console.error('Error fetching analytics:', error);
       }
     };
     fetchAnalytics();
+
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchAnalytics, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   // Calculate metrics from beds data
@@ -58,36 +62,43 @@ const ExecutiveSummary = () => {
     .filter(Boolean)
     .slice(0, 3);
 
+  // Get week-over-week changes from analytics data
+  const weekOverWeek = analyticsData?.weekOverWeek || {};
+  const totalBedsChange = weekOverWeek.totalBedsChange || 0;
+  const occupiedChange = weekOverWeek.occupiedChange || 0;
+  const availableChange = weekOverWeek.availableChange || 0;
+  const occupancyRateChange = weekOverWeek.occupancyRateChange || '+0%';
+
   const kpis = [
     {
       title: 'Total Beds',
       value: totalBeds.toString(),
-      change: '+0',
-      changeType: 'positive',
+      change: totalBedsChange === 0 ? '+0' : `${totalBedsChange > 0 ? '+' : ''}${totalBedsChange}`,
+      changeType: totalBedsChange >= 0 ? 'positive' : 'negative',
       icon: Bed,
       color: 'from-blue-500 to-cyan-500',
     },
     {
       title: 'Occupancy Rate',
       value: `${occupancyRate}%`,
-      change: '+0%',
-      changeType: 'positive',
+      change: occupancyRateChange,
+      changeType: occupancyRateChange.includes('-') ? 'negative' : 'positive',
       icon: Activity,
       color: 'from-purple-500 to-pink-500',
     },
     {
       title: 'Active Patients',
       value: occupiedBeds.toString(),
-      change: '+0',
-      changeType: 'positive',
+      change: occupiedChange === 0 ? '+0' : `${occupiedChange > 0 ? '+' : ''}${occupiedChange}`,
+      changeType: occupiedChange >= 0 ? 'positive' : 'negative',
       icon: Users,
       color: 'from-green-500 to-emerald-500',
     },
     {
       title: 'Available Beds',
       value: availableBeds.toString(),
-      change: '+0',
-      changeType: 'positive',
+      change: availableChange === 0 ? '+0' : `${availableChange > 0 ? '+' : ''}${availableChange}`,
+      changeType: availableChange >= 0 ? 'positive' : 'negative',
       icon: TrendingUp,
       color: 'from-orange-500 to-yellow-500',
     },
