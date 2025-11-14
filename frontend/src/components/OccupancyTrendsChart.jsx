@@ -11,7 +11,7 @@ const OccupancyTrendsChart = () => {
   const dispatch = useDispatch();
   const { bedsList, status } = useSelector((state) => state.beds);
   const [timeRange, setTimeRange] = useState('7days');
-  const [selectedWard, setSelectedWard] = useState('all');
+  const [selectedWard, setSelectedWard] = useState('allwards');
   const [trendData, setTrendData] = useState({});
   const [wards, setWards] = useState(['All Wards']);
 
@@ -157,7 +157,7 @@ const OccupancyTrendsChart = () => {
           <div className="flex flex-wrap gap-2 items-center">
             <Select value={selectedWard} onValueChange={setSelectedWard}>
               <SelectTrigger className="w-[180px] border-neutral-600 h-10">
-                <SelectValue placeholder="Select ward" />
+                <SelectValue placeholder="All Wards" />
               </SelectTrigger>
               <SelectContent>
                 {wards.map((ward) => (
