@@ -343,7 +343,7 @@ const ForecastingPanel = ({ ward }) => {
                     </div>
                   )}
                   {next6Hours > 0 && (
-                    <div className="flex items-start gap-3 p-3 rounded bg-orange-500/10 border-l-2 border-orange-500">
+                    <div className="flex items-start gap-3 p-3 rounded bg-orange-500/10 border-l-2 border-orange-500 text-left">
                       <Clock className="w-4 h-4 mt-0.5 text-orange-500" />
                       <div>
                         <p className="text-zinc-200 text-sm font-semibold">Upcoming Discharges</p>

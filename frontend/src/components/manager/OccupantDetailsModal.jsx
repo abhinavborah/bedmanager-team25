@@ -53,7 +53,7 @@ const OccupantDetailsModal = ({ bed, onClose }) => {
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Current Bed Information */}
-          <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-6">
+          <div className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-6 text-left">
             <h3 className="text-white text-lg font-bold mb-4">Current Status</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">

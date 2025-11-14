@@ -165,7 +165,7 @@ const BedStatusGrid = ({ ward, onBedClick }) => {
       <div className="mb-4 p-3 bg-zinc-800/50 border border-zinc-700 rounded-lg">
         <p className="text-sm text-zinc-400">
           ℹ️ <span className="font-semibold">Note:</span> Beds with{' '}
-          <span className="text-orange-400 font-semibold">Cleaning</span> status are being cleaned by ward staff and cannot be updated by managers.
+          <span className="text-orange-400 font-semibold">Cleaning</span> status are being cleaned by ward staff.
         </p>
       </div>
 
