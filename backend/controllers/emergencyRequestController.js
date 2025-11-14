@@ -1,5 +1,6 @@
 // backend/controllers/emergencyRequestController.js
 const EmergencyRequest = require('../models/EmergencyRequest');
+const Alert = require('../models/Alert');
 const mongoose = require('mongoose');
 
 /**
@@ -39,6 +40,26 @@ exports.createEmergencyRequest = async (req, res) => {
       description: description || null
     });
 
+    // Create an alert for this emergency request
+    const alertSeverity = {
+      'critical': 'critical',
+      'high': 'high',
+      'medium': 'medium',
+      'low': 'low'
+    }[priority] || 'medium';
+
+    const alert = await Alert.create({
+      type: 'request_pending',
+      severity: alertSeverity,
+      message: `Emergency bed request for ${patientName} at ${location} (${ward} ward)`,
+      relatedRequest: emergencyRequest._id,
+      ward: ward,
+      targetRole: ['manager', 'hospital_admin'],
+      read: false
+    });
+
+    console.log('✅ Alert created for emergency request:', alert._id);
+
     // Emit Socket.io event for real-time notification to ward-specific room
     if (req.io) {
       // Emit to ward-specific room and all managers
@@ -67,7 +88,13 @@ exports.createEmergencyRequest = async (req, res) => {
         createdAt: emergencyRequest.createdAt
       });
       
+      // Emit alert created event
+      req.io.to(`ward-${ward}`).emit('alertCreated', alert);
+      req.io.to('role-hospital_admin').emit('alertCreated', alert);
+      req.io.to('role-manager').emit('alertCreated', alert);
+      
       console.log(`✅ Socket event emitted: emergencyRequestCreated to ward-${ward}`);
+      console.log(`✅ Socket event emitted: alertCreated for emergency request`);
     }
 
     res.status(201).json({
@@ -360,6 +387,12 @@ exports.approveEmergencyRequest = async (req, res) => {
     emergencyRequest.status = 'approved';
     await emergencyRequest.save();
 
+    // Update related alert to mark as read (dismissed)
+    await Alert.findOneAndUpdate(
+      { relatedRequest: emergencyRequest._id },
+      { read: true }
+    );
+
     // Populate patient details
     await emergencyRequest.populate('patientId', 'name email');
 
@@ -455,6 +488,12 @@ exports.rejectEmergencyRequest = async (req, res) => {
       emergencyRequest.description = rejectionReason;
     }
     await emergencyRequest.save();
+
+    // Update related alert to mark as read (dismissed)
+    await Alert.findOneAndUpdate(
+      { relatedRequest: emergencyRequest._id },
+      { read: true }
+    );
 
     // Populate patient details
     await emergencyRequest.populate('patientId', 'name email');
