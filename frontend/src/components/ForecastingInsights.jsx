@@ -262,7 +262,7 @@ const ForecastingInsights = () => {
       {/* Model Information */}
       <Card className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/30">
         <CardContent className="p-4">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-3 text-left">
             <Lightbulb className="w-5 h-5 text-blue-400 mt-1" />
             <div className="flex-1">
               <h4 className="font-semibold text-blue-400 mb-1">About This Forecast</h4>
