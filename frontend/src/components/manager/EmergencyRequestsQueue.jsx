@@ -102,47 +102,71 @@ const EmergencyRequestsQueue = ({ ward, onApprovalSuccess }) => {
   }, [dispatch, ward, currentUser?.ward]);
 
   const handleApprove = async (requestId) => {
-    if (window.confirm('Are you sure you want to approve this emergency request?')) {
-      setProcessingId(requestId);
-      try {
-        await dispatch(approveRequest({ id: requestId })).unwrap();
+    // Show confirmation toast
+    setToast({
+      type: 'warning',
+      title: 'Confirm Approval',
+      message: 'Click OK to approve this emergency request',
+      onConfirm: async () => {
+        setToast(null);
+        setProcessingId(requestId);
+        try {
+          await dispatch(approveRequest({ id: requestId })).unwrap();
 
-        // Find the approved request to pass patient data
-        const approvedRequest = filteredRequests.find(req => req._id === requestId);
+          // Find the approved request to pass patient data
+          const approvedRequest = filteredRequests.find(req => req._id === requestId);
 
-        // Call the callback with patient data for bed assignment
-        if (onApprovalSuccess && approvedRequest) {
-          onApprovalSuccess({
-            patientName: approvedRequest.patientName,
-            patientId: approvedRequest.patientId,
-            patientContact: approvedRequest.patientContact,
-            reason: approvedRequest.reason || approvedRequest.description,
-            ward: approvedRequest.ward,
-            priority: approvedRequest.priority
+          // Show success toast
+          setToast({
+            type: 'success',
+            title: 'Request Approved',
+            message: 'Emergency request approved successfully!',
           });
-        } else {
-          alert('Emergency request approved successfully!');
+
+          // Call the callback with patient data for bed assignment
+          if (onApprovalSuccess && approvedRequest) {
+            setTimeout(() => {
+              onApprovalSuccess({
+                patientName: approvedRequest.patientName,
+                patientId: approvedRequest.patientId,
+                patientContact: approvedRequest.patientContact,
+                reason: approvedRequest.reason || approvedRequest.description,
+                ward: approvedRequest.ward,
+                priority: approvedRequest.priority
+              });
+            }, 1000);
+          }
+        } catch (error) {
+          setToast({
+            type: 'error',
+            title: 'Approval Failed',
+            message: error.message || 'Failed to approve request',
+          });
+        } finally {
+          setProcessingId(null);
         }
-      } catch (error) {
-        alert(`Error: ${error.message || 'Failed to approve request'}`);
-      } finally {
-        setProcessingId(null);
       }
-    }
+    });
   };
 
   const handleReject = async (requestId) => {
-    const reason = window.prompt('Please provide a reason for rejection (optional):');
-    if (reason !== null) {
-      setProcessingId(requestId);
-      try {
-        await dispatch(rejectRequest({ id: requestId, rejectionReason: reason })).unwrap();
-        alert('Emergency request rejected.');
-      } catch (error) {
-        alert(`Error: ${error.message || 'Failed to reject request'}`);
-      } finally {
-        setProcessingId(null);
-      }
+    setProcessingId(requestId);
+    try {
+      await dispatch(rejectRequest({ id: requestId, rejectionReason: 'Rejected by manager' })).unwrap();
+
+      setToast({
+        type: 'success',
+        title: 'Request Rejected',
+        message: 'Emergency request has been rejected.',
+      });
+    } catch (error) {
+      setToast({
+        type: 'error',
+        title: 'Rejection Failed',
+        message: error.message || 'Failed to reject request',
+      });
+    } finally {
+      setProcessingId(null);
     }
   };
 
@@ -291,7 +315,8 @@ const EmergencyRequestsQueue = ({ ward, onApprovalSuccess }) => {
           title={toast.title}
           message={toast.message}
           onClose={() => setToast(null)}
-          duration={8000}
+          duration={toast.onConfirm ? 0 : 8000}
+          onConfirm={toast.onConfirm}
         />
       )}
     </div>

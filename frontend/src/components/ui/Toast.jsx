@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react';
 import { X, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react';
 
-const Toast = ({ message, type = 'info', onClose, duration = 5000, title }) => {
+const Toast = ({ message, type = 'info', onClose, duration = 5000, title, onConfirm }) => {
   useEffect(() => {
-    if (duration > 0) {
+    // Don't auto-dismiss if there's a confirmation action
+    if (duration > 0 && !onConfirm) {
       const timer = setTimeout(() => {
         onClose();
       }, duration);
       return () => clearTimeout(timer);
     }
-  }, [duration, onClose]);
+  }, [duration, onClose, onConfirm]);
 
   const getConfig = () => {
     switch (type) {
@@ -77,14 +78,36 @@ const Toast = ({ message, type = 'info', onClose, duration = 5000, title }) => {
             <h4 className="font-bold text-lg mb-1">{title}</h4>
           )}
           <p className="text-sm leading-relaxed">{message}</p>
+
+          {/* Confirmation buttons if onConfirm is provided */}
+          {onConfirm && (
+            <div className="flex gap-2 mt-3">
+              <button
+                onClick={() => {
+                  onConfirm();
+                }}
+                className="px-4 py-2 bg-white text-neutral-900 rounded-md font-semibold hover:bg-neutral-100 transition-colors"
+              >
+                OK
+              </button>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-white/20 text-white rounded-md font-semibold hover:bg-white/30 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
-        <button
-          onClick={onClose}
-          className="flex-shrink-0 hover:bg-white/20 rounded p-1 transition-colors ml-2"
-          aria-label="Close notification"
-        >
-          <X className="w-5 h-5" />
-        </button>
+        {!onConfirm && (
+          <button
+            onClick={onClose}
+            className="flex-shrink-0 hover:bg-white/20 rounded p-1 transition-colors ml-2"
+            aria-label="Close notification"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
     </div>
   );
