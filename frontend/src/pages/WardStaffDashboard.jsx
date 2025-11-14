@@ -190,14 +190,16 @@ const WardStaffDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
           {/* Bed Grid */}
           <div className="lg:col-span-2">
-            <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-3 sm:p-4">
-              <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4">Bed Status</h2>
-              <WardBedGrid beds={wardBeds} onStatusUpdate={handleStatusUpdate} isOffline={!online} />
+            <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-3 sm:p-4 lg:h-[600px] flex flex-col">
+              <h2 className="text-lg sm:text-xl font-bold text-white mb-3 sm:mb-4 flex-shrink-0">Bed Status</h2>
+              <div className="overflow-y-auto flex-1">
+                <WardBedGrid beds={wardBeds} onStatusUpdate={handleStatusUpdate} isOffline={!online} />
+              </div>
             </div>
           </div>
 
           {/* Task 4.3: Available Beds List - full width on mobile, sidebar on desktop */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 lg:h-[600px]">
             <AvailableBedsList beds={wardBeds} />
           </div>
         </div>

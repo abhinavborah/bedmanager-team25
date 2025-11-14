@@ -52,20 +52,20 @@ const AvailableBedsList = ({ beds }) => {
 
   return (
     // Task 4.3: Mobile-optimized container with responsive padding
-    <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-3 sm:p-4">
-      <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
+    <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-3 sm:p-4 h-full flex flex-col">
+      <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4 flex-shrink-0">
         Available Beds ({availableBeds.length})
       </h3>
 
       {availableBeds.length === 0 ? (
         // Task 4.3: Better empty state with icon
-        <div className="text-neutral-400 text-center py-6 sm:py-8">
+        <div className="text-neutral-400 text-center py-6 sm:py-8 flex-1 flex flex-col justify-center">
           <div className="text-3xl sm:text-4xl mb-2">🛏️</div>
           <p className="text-xs sm:text-sm">No available beds</p>
         </div>
       ) : (
         // Task 4.3: Optimized scrolling list with smaller gaps on mobile
-        <div className="space-y-2 max-h-[400px] sm:max-h-[500px] overflow-y-auto overscroll-contain">
+        <div className="space-y-2 overflow-y-auto overscroll-contain flex-1">
           {availableBeds.map((bed) => (
             <BedListItem key={bed._id} bed={bed} />
           ))}
