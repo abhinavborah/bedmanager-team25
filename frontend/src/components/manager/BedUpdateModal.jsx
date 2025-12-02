@@ -526,7 +526,7 @@ const BedUpdateModal = ({ bed, isOpen, onClose, onSuccess, emergencyPatientData 
                       </label>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-xs text-zinc-500 mb-1 text-left">Date (DD/MM/YYYY)</label>
+                          <label className="block text-xs text-zinc-500 mb-1 text-left">Date (MM/DD/YYYY)</label>
                           <input
                             type="date"
                             value={estimatedDischargeTime.split('T')[0] || ''}
@@ -535,7 +535,7 @@ const BedUpdateModal = ({ bed, isOpen, onClose, onSuccess, emergencyPatientData 
                               const time = estimatedDischargeTime.split('T')[1] || '00:00';
                               setEstimatedDischargeTime(date ? `${date}T${time}` : '');
                             }}
-                            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:border-neutral-400 [color-scheme:dark] cursor-pointer"
+                            className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-neutral-400 [color-scheme:dark] cursor-pointer text-zinc-500 [&::-webkit-datetime-edit-fields-wrapper]:text-zinc-500 [&::-webkit-datetime-edit-text]:text-zinc-500 [&::-webkit-datetime-edit-month-field]:text-zinc-500 [&::-webkit-datetime-edit-day-field]:text-zinc-500 [&::-webkit-datetime-edit-year-field]:text-zinc-500 [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer hover:border-neutral-400 transition-colors"
                             disabled={isUpdating}
                           />
                         </div>

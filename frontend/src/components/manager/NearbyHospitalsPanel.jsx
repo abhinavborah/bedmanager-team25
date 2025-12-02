@@ -22,7 +22,6 @@ const NearbyHospitalsPanel = ({ ward }) => {
   const [error, setError] = useState(null);
   const isAdmin = currentUser?.role === 'hospital_admin';
   const [selectedWard, setSelectedWard] = useState(ward || currentUser?.ward || 'ICU');
-  const [maxDistance, setMaxDistance] = useState(10);
   const [showFilters, setShowFilters] = useState(false);
 
   const fetchHospitals = async () => {
@@ -32,7 +31,6 @@ const NearbyHospitalsPanel = ({ ward }) => {
       const params = new URLSearchParams();
       // Admin users don't filter by ward - they see all wards
       if (!isAdmin && selectedWard) params.append('ward', selectedWard);
-      if (maxDistance) params.append('maxDistance', maxDistance);
 
       const response = await api.get(`/referrals/nearby-hospitals?${params.toString()}`);
 
@@ -52,7 +50,7 @@ const NearbyHospitalsPanel = ({ ward }) => {
     // Refresh every 5 minutes
     const interval = setInterval(fetchHospitals, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [selectedWard, maxDistance, isAdmin]);
+  }, [selectedWard, isAdmin]);
 
   const getOccupancyColor = (rate) => {
     if (rate >= 90) return 'text-red-500';
@@ -157,17 +155,6 @@ const NearbyHospitalsPanel = ({ ward }) => {
               {!isAdmin && (
                 <p className="text-xs text-zinc-500 mt-1">Showing {selectedWard} beds only</p>
               )}
-            </div>
-            <div>
-              <label className="block text-xs text-zinc-400 mb-1">Max Distance: {maxDistance} km</label>
-              <input
-                type="range"
-                value={maxDistance}
-                onChange={(e) => setMaxDistance(e.target.value)}
-                min="1"
-                max="20"
-                className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-              />
             </div>
           </div>
         )}
