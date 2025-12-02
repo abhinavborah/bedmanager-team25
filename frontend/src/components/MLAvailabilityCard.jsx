@@ -13,8 +13,8 @@ import { Target, TrendingUp, Calendar, BedDouble, Info, ArrowRight } from 'lucid
  * @param {number} confidence24h - Confidence score 0-1 for 24h (optional, default 0.85)
  * @param {number} confidence48h - Confidence score 0-1 for 48h (optional, default 0.75)
  */
-const MLAvailabilityCard = ({ 
-  available24h = 0, 
+const MLAvailabilityCard = ({
+  available24h = 0,
   available48h = 0,
   currentAvailable = null,
   totalBeds = null,
@@ -76,7 +76,7 @@ const MLAvailabilityCard = ({
   const status48h = getAvailabilityStatus(available48h, totalBeds);
 
   return (
-    <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/30">
+    <Card className="bg-neutral-900 border-neutral-700">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-xl">
@@ -118,18 +118,17 @@ const MLAvailabilityCard = ({
               </div>
               {getTrendIcon(change24h)}
             </div>
-            
+
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-4xl font-bold text-white">{available24h}</span>
               <span className="text-lg text-slate-300">beds</span>
               {change24h !== null && (
-                <Badge 
-                  variant="outline" 
-                  className={`ml-2 ${
-                    change24h > 0 ? 'border-green-500/50 text-green-400' : 
-                    change24h < 0 ? 'border-red-500/50 text-red-400' : 
-                    'border-slate-500/50 text-slate-400'
-                  }`}
+                <Badge
+                  variant="outline"
+                  className={`ml-2 ${change24h > 0 ? 'border-green-500/50 text-green-400' :
+                      change24h < 0 ? 'border-red-500/50 text-red-400' :
+                        'border-slate-500/50 text-slate-400'
+                    }`}
                 >
                   {getTrendText(change24h)}
                 </Badge>
@@ -168,18 +167,17 @@ const MLAvailabilityCard = ({
               </div>
               {getTrendIcon(change48h)}
             </div>
-            
+
             <div className="flex items-baseline gap-2 mb-2">
               <span className="text-4xl font-bold text-white">{available48h}</span>
               <span className="text-lg text-slate-300">beds</span>
               {change48h !== null && (
-                <Badge 
-                  variant="outline" 
-                  className={`ml-2 ${
-                    change48h > 0 ? 'border-green-500/50 text-green-400' : 
-                    change48h < 0 ? 'border-red-500/50 text-red-400' : 
-                    'border-slate-500/50 text-slate-400'
-                  }`}
+                <Badge
+                  variant="outline"
+                  className={`ml-2 ${change48h > 0 ? 'border-green-500/50 text-green-400' :
+                      change48h < 0 ? 'border-red-500/50 text-red-400' :
+                        'border-slate-500/50 text-slate-400'
+                    }`}
                 >
                   {getTrendText(change48h)}
                 </Badge>
