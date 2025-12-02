@@ -11,7 +11,8 @@ import {
   ExternalLink,
   CheckCircle,
   RefreshCw,
-  Filter
+  Filter,
+  Map
 } from 'lucide-react';
 import api from '@/services/api';
 
@@ -353,6 +354,18 @@ const NearbyHospitalsPanel = ({ ward }) => {
                       >
                         <Phone className="w-3 h-3" />
                         <span className="hidden sm:inline">Call</span>
+                      </a>
+                    )}
+                    {hospital.location && (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${hospital.location.latitude},${hospital.location.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors"
+                        title="View on Google Maps"
+                      >
+                        <Map className="w-3 h-3" />
+                        <span className="hidden sm:inline">Map</span>
                       </a>
                     )}
                     {hospital.website && (
