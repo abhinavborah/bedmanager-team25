@@ -25,15 +25,23 @@ const OccupancyTrendsChart = () => {
     // Extract unique wards from beds data
     const uniqueWards = ['All Wards', ...new Set(bedsList.map(bed => bed.ward))];
     setWards(uniqueWards);
+  }, [bedsList]);
 
-    // Generate trend data based on current bed status
-    // Since OccupancyLog only tracks changes and not point-in-time snapshots,
-    // we use current occupancy to generate realistic trend visualization
+  useEffect(() => {
+    // Generate trend data based on current bed status filtered by selected ward
     const generateTrendData = () => {
-      const totalBeds = bedsList.length;
-      const occupiedBeds = bedsList.filter(bed => bed.status === 'occupied').length;
+      // Filter beds by selected ward
+      const filteredBeds = selectedWard === 'allwards' 
+        ? bedsList 
+        : bedsList.filter(bed => bed.ward.toLowerCase().replace(/\s+/g, '') === selectedWard);
+
+      const totalBeds = filteredBeds.length;
+      const occupiedBeds = filteredBeds.filter(bed => bed.status === 'occupied').length;
       const currentOccupancy = totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 0;
 
+      // Create a seed based on ward name for consistent but different patterns per ward
+      const wardSeed = selectedWard === 'allwards' ? 0 : selectedWard.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      
       // Generate realistic trends with variation around current occupancy
       let data;
 
@@ -43,8 +51,9 @@ const OccupancyTrendsChart = () => {
           // Create realistic variation: weekdays higher, weekends lower
           const isWeekend = i >= 5;
           const baseVariation = isWeekend ? -5 : 2;
-          const randomVariation = Math.floor(Math.random() * 8 - 4); // -4 to +4
-          const occupancy = Math.max(0, Math.min(100, currentOccupancy + baseVariation + randomVariation));
+          // Use ward seed to create different but consistent patterns per ward
+          const seededVariation = ((wardSeed + i * 7) % 9) - 4; // -4 to +4
+          const occupancy = Math.max(0, Math.min(100, currentOccupancy + baseVariation + seededVariation));
 
           return {
             day,
@@ -55,8 +64,8 @@ const OccupancyTrendsChart = () => {
       } else if (timeRange === '30days') {
         // 4 weeks of data
         data = Array.from({ length: 4 }, (_, i) => {
-          const variation = Math.floor(Math.random() * 10 - 5);
-          const occupancy = Math.max(0, Math.min(100, currentOccupancy + variation));
+          const seededVariation = ((wardSeed + i * 11) % 11) - 5; // -5 to +5
+          const occupancy = Math.max(0, Math.min(100, currentOccupancy + seededVariation));
 
           return {
             day: `Week ${i + 1}`,
@@ -67,8 +76,8 @@ const OccupancyTrendsChart = () => {
       } else {
         // 3 months of data
         data = Array.from({ length: 3 }, (_, i) => {
-          const variation = Math.floor(Math.random() * 8 - 4);
-          const occupancy = Math.max(0, Math.min(100, currentOccupancy + variation));
+          const seededVariation = ((wardSeed + i * 13) % 9) - 4; // -4 to +4
+          const occupancy = Math.max(0, Math.min(100, currentOccupancy + seededVariation));
 
           return {
             day: `Month ${i + 1}`,
@@ -84,7 +93,7 @@ const OccupancyTrendsChart = () => {
     if (bedsList.length > 0) {
       generateTrendData();
     }
-  }, [bedsList, timeRange]);
+  }, [bedsList, timeRange, selectedWard]);
 
   const currentData = trendData[timeRange] || [];
   const avgOccupancy = currentData.length > 0
