@@ -22,6 +22,8 @@ const NearbyHospitalsPanel = ({ ward }) => {
   const [error, setError] = useState(null);
   const isAdmin = currentUser?.role === 'hospital_admin';
   const [selectedWard, setSelectedWard] = useState(ward || currentUser?.ward || 'ICU');
+  const [maxDistance, setMaxDistance] = useState(10);
+  const [sliderValue, setSliderValue] = useState(10);
   const [showFilters, setShowFilters] = useState(false);
 
   const fetchHospitals = async () => {
@@ -31,6 +33,7 @@ const NearbyHospitalsPanel = ({ ward }) => {
       const params = new URLSearchParams();
       // Admin users don't filter by ward - they see all wards
       if (!isAdmin && selectedWard) params.append('ward', selectedWard);
+      if (maxDistance) params.append('maxDistance', maxDistance);
 
       const response = await api.get(`/referrals/nearby-hospitals?${params.toString()}`);
 
@@ -50,7 +53,7 @@ const NearbyHospitalsPanel = ({ ward }) => {
     // Refresh every 5 minutes
     const interval = setInterval(fetchHospitals, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [selectedWard, isAdmin]);
+  }, [selectedWard, maxDistance, isAdmin]);
 
   const getOccupancyColor = (rate) => {
     if (rate >= 90) return 'text-red-500';
@@ -140,21 +143,17 @@ const NearbyHospitalsPanel = ({ ward }) => {
         {showFilters && (
           <div className="space-y-3 pt-3 border-t border-zinc-700">
             <div>
-              <label className="block text-xs text-zinc-400 mb-1">Ward Type</label>
-              <select
-                value={selectedWard}
-                onChange={(e) => setSelectedWard(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-500"
-                disabled={!isAdmin}
-              >
-                <option value="ICU">ICU</option>
-                <option value="Emergency">Emergency</option>
-                <option value="General">General</option>
-                <option value="Pediatrics">Pediatrics</option>
-              </select>
-              {!isAdmin && (
-                <p className="text-xs text-zinc-500 mt-1">Showing {selectedWard} beds only</p>
-              )}
+              <label className="block text-xs text-zinc-400 mb-1">Max Distance: {sliderValue} km</label>
+              <input
+                type="range"
+                value={sliderValue}
+                onChange={(e) => setSliderValue(e.target.value)}
+                onMouseUp={(e) => setMaxDistance(e.target.value)}
+                onTouchEnd={(e) => setMaxDistance(e.target.value)}
+                min="1"
+                max="20"
+                className="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+              />
             </div>
           </div>
         )}
