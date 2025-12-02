@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import ExecutiveSummary from '@/components/ExecutiveSummary';
 import WardUtilizationReport from '@/components/WardUtilizationReport';
+import OccupancyTrendsChart from '@/components/OccupancyTrendsChart';
+import ForecastingInsights from '@/components/ForecastingInsights';
+import ReportGenerator from '@/components/ReportGenerator';
 import AlertNotificationPanel from '@/components/manager/AlertNotificationPanel';
 import DashboardLayout from '@/components/DashboardLayout';
 import api from '@/services/api';
 
 const AdminDashboard = () => {
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'overview');
   const [backendConnected, setBackendConnected] = useState(true);
 
   // Check backend connectivity
@@ -47,20 +53,81 @@ const AdminDashboard = () => {
           </p>
         </div>
 
-        {/* Executive Summary - Always Visible */}
-        <div className="mb-8">
-          <ExecutiveSummary />
+        {/* Tab Navigation */}
+        <div className="mb-6 bg-neutral-900 border border-neutral-700 rounded-lg p-1 flex gap-1">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`flex-1 px-6 py-3 rounded-md font-semibold transition-colors ${
+              activeTab === 'overview'
+                ? 'bg-blue-600 text-white'
+                : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+            }`}
+          >
+            Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('trends')}
+            className={`flex-1 px-6 py-3 rounded-md font-semibold transition-colors ${
+              activeTab === 'trends'
+                ? 'bg-blue-600 text-white'
+                : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+            }`}
+          >
+            Trends
+          </button>
+          <button
+            onClick={() => setActiveTab('forecasting')}
+            className={`flex-1 px-6 py-3 rounded-md font-semibold transition-colors ${
+              activeTab === 'forecasting'
+                ? 'bg-blue-600 text-white'
+                : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+            }`}
+          >
+            Forecasting
+          </button>
+          <button
+            onClick={() => setActiveTab('reports')}
+            className={`flex-1 px-6 py-3 rounded-md font-semibold transition-colors ${
+              activeTab === 'reports'
+                ? 'bg-blue-600 text-white'
+                : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+            }`}
+          >
+            Reports
+          </button>
         </div>
 
-        {/* Active Alerts */}
-        <div className="mb-8">
-          <AlertNotificationPanel />
-        </div>
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <div className="space-y-8">
+            {/* Executive Summary */}
+            <ExecutiveSummary />
 
-        {/* Ward Utilization Report */}
-        <div className="space-y-6">
-          <WardUtilizationReport />
-        </div>
+            {/* Active Alerts */}
+            <AlertNotificationPanel />
+
+            {/* Ward Utilization Report */}
+            <WardUtilizationReport />
+          </div>
+        )}
+
+        {activeTab === 'trends' && (
+          <div className="space-y-6">
+            <OccupancyTrendsChart />
+          </div>
+        )}
+
+        {activeTab === 'forecasting' && (
+          <div className="space-y-6">
+            <ForecastingInsights />
+          </div>
+        )}
+
+        {activeTab === 'reports' && (
+          <div className="space-y-6">
+            <ReportGenerator />
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
