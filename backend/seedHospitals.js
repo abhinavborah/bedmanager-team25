@@ -1,9 +1,9 @@
 // backend/seedHospitals.js
 // Script to seed nearby hospitals data into MongoDB
 
+require('dotenv').config();
 const mongoose = require('mongoose');
 const Hospital = require('./models/Hospital');
-require('dotenv').config();
 
 const hospitalsData = [
   {
