@@ -31,7 +31,7 @@ const ReportGenerator = () => {
     }
   }, [dispatch, status]);
 
-  // Load recent reports from localStorage
+  // Load recent reports and cached email from localStorage
   useEffect(() => {
     const savedReports = localStorage.getItem('recentReports');
     if (savedReports) {
@@ -41,6 +41,12 @@ const ReportGenerator = () => {
         console.error('Error loading recent reports:', error);
         setRecentReports([]);
       }
+    }
+
+    // Load cached email address
+    const cachedEmail = localStorage.getItem('reportEmailAddress');
+    if (cachedEmail) {
+      setEmailAddress(cachedEmail);
     }
   }, []);
 
@@ -196,7 +202,7 @@ const ReportGenerator = () => {
     };
 
     // Add type-specific data
-    switch(reportType) {
+    switch (reportType) {
       case 'comprehensive':
         return {
           ...baseData,
@@ -640,8 +646,10 @@ const ReportGenerator = () => {
         format: emailFormat
       });
 
+      // Cache the email address for future use
+      localStorage.setItem('reportEmailAddress', emailAddress);
+
       alert(`Report sent successfully to ${emailAddress}!`);
-      setEmailAddress('');
       setIsEmailing(false);
     } catch (error) {
       console.error('Error sending email:', error);
