@@ -25,11 +25,6 @@ venv/
 ENV/
 env/
 
-# ML Models (too large for git)
-models/*.pkl
-models/*.joblib
-models/*.h5
-
 # Environment variables
 .env
 
