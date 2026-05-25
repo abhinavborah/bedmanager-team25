@@ -101,7 +101,7 @@ For **step-by-step installation**, environment setup, and troubleshooting, see [
 1. **Clone the repository**
 
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/abhinavborah/bedmanager-team25
    cd bedmanager-team25
    ```
 
