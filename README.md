@@ -9,7 +9,7 @@
 
 ## Overview
 
-**Bed Manager** is a full-stack hospital bed management platform built to streamline bed allocation across multiple wards. It provides **real-time occupancy tracking**, **predictive ML analytics**, and **tailored dashboards** for every role — from front-line ward staff to hospital administrators.
+**Bed Manager** is a full-stack hospital bed management platform built to streamline bed allocation across multiple wards. It provides **real-time occupancy tracking**, **predictive ML analytics**, and **tailored dashboards** for every role: from front-line ward staff to hospital administrators.
 
 The system manages **multiple beds** across customizable wards:
 
@@ -25,15 +25,15 @@ example:
 
 ## Features
 
-- **Real-Time Bed Tracking** — Live occupancy status via Socket.IO; instant updates across all connected clients.
-- **Predictive Analytics** — ML-powered forecasts for discharge timing, cleaning duration, and bed availability to reduce idle time.
-- **Multi-Role Dashboards** — Custom views for:
-  - **Admin** — System-wide oversight, user management, reporting.
-  - **Manager** — Ward-level KPIs, capacity planning, audit logs.
-  - **Ward Staff** — Bed assignment, patient check-in/out, cleaning status.
-  - **ER Staff** — Fast admission triage, emergency bed search.
-- **Smart Allocation** — Suggests optimal beds based on patient priority, ward capacity, and predicted availability.
-- **Responsive UI** — Modern React 19 interface built with Vite for fast development and production builds.
+- **Real-Time Bed Tracking**: Live occupancy status via Socket.IO; instant updates across all connected clients.
+- **Predictive Analytics**: ML-powered forecasts for discharge timing, cleaning duration, and bed availability to reduce idle time.
+- **Multi-Role Dashboards**: Custom views for:
+  - **Admin**: System-wide oversight, user management, reporting.
+  - **Manager**: Ward-level KPIs, capacity planning, audit logs.
+  - **Ward Staff**: Bed assignment, patient check-in/out, cleaning status.
+  - **ER Staff**: Fast admission triage, emergency bed search.
+- **Smart Allocation**: Suggests optimal beds based on patient priority, ward capacity, and predicted availability.
+- **Responsive UI**: Modern React 19 interface built with Vite for fast development and production builds.
 
 ---
 
