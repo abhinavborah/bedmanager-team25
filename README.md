@@ -7,6 +7,12 @@
 
 ---
 
+## Youtube Demo
+
+[![Bed Manager Demo](./demo/yt.png)](https://www.youtube.com/watch?v=mjSeZ1kM7pI)
+
+[Full Video](https://www.youtube.com/watch?v=mjSeZ1kM7pI)
+
 ## Overview
 
 **Bed Manager** is a full-stack hospital bed management platform built to streamline bed allocation across multiple wards. It provides **real-time occupancy tracking**, **predictive ML analytics**, and **tailored dashboards** for every role: from front-line ward staff to hospital administrators.
